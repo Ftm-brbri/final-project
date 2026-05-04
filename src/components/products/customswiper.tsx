@@ -10,6 +10,7 @@ export default function HeroSlider() {
   return (
     <div className="relative pb-16">
       <Swiper
+        dir="ltr"
         className="hero-swiper"
         modules={[Pagination, Autoplay]}
         pagination={{

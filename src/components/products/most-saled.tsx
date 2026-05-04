@@ -12,7 +12,35 @@ export function MostSaled() {
             </button>
           </div>
 
-          <div className="flex overflow-x-auto lg:overflow-visible gap-5 pb-4 w-full snap-x">
+          <div className="flex overflow-x-auto overflow-visible gap-5 pb-4 w-full snap-x">
+            <div className="bg-white min-w-[220px] sm:min-w-[250px] flex-shrink-0 snap-center rounded-2xl cursor-pointer hover:-translate-y-2 transition-transform duration-300 overflow-hidden shadow-lg">
+              <img
+                className="h-48 w-full object-cover"
+                src="/image/pro_56532_558.webp"
+                alt="DK.1.12689-5"
+              />
+              <div className="p-4 flex flex-col gap-2">
+                <p className="text-gray-950 font-semibold truncate">
+             کفش ورزشی مردانه نایک
+                </p>
+                <p className="text-gray-600 text-sm">موجود در انبار</p>
+                <p className="text-[#CDAE8C] font-bold">4,800,000 تومان</p>
+              </div>
+            </div>
+            <div className="bg-white min-w-[220px] sm:min-w-[250px] flex-shrink-0 snap-center rounded-2xl cursor-pointer hover:-translate-y-2 transition-transform duration-300 overflow-hidden shadow-lg">
+              <img
+                className="h-48 w-full object-cover"
+                src="/image/pro_61092_558.webp"
+                alt="DK.1.12689-5"
+              />
+              <div className="p-4 flex flex-col gap-2">
+                <p className="text-gray-950 font-semibold truncate">
+                 کفش والیبال زنانه اسیکس
+                </p>
+                <p className="text-gray-600 text-sm">موجود در انبار</p>
+                <p className="text-[#CDAE8C] font-bold">2,500,000 تومان</p>
+              </div>
+            </div>
             <div className="bg-white min-w-[220px] sm:min-w-[250px] flex-shrink-0 snap-center rounded-2xl cursor-pointer hover:-translate-y-2 transition-transform duration-300 overflow-hidden shadow-lg">
               <img
                 className="h-48 w-full object-cover"
@@ -51,7 +79,7 @@ export function MostSaled() {
               />
               <div className="p-4 flex flex-col gap-2">
                 <p className="text-gray-950 font-semibold truncate">
-                 کفش پیاده روی مردانه اسپورتلند
+                  کفش پیاده روی مردانه اسپورتلند
                 </p>
                 <p className="text-gray-600 text-sm">موجود در انبار</p>
                 <p className="text-[#CDAE8C] font-bold">1,500,000 تومان</p>
@@ -66,10 +94,10 @@ export function MostSaled() {
               />
               <div className="p-4 flex flex-col gap-2">
                 <p className="text-gray-950 font-semibold truncate">
-                 کفش روزانه زنانه نایک
+                  کفش روزانه زنانه نایک
                 </p>
                 <p className="text-gray-600 text-sm">موجود در انبار</p>
-                <p className="text-[#CDAE8C] font-bold">4,500,000 تومان</p>
+                <p className="text-[#CDAE8C] font-bold">3,700,000 تومان</p>
               </div>
             </div>
           </div>
