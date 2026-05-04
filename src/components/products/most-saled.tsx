@@ -1,4 +1,4 @@
-export function MoreSaled() {
+export function MostSaled() {
   return (
     <div className="w-full bg-primary py-10 md:py-16 mt-10">
       <div className="max-w-7xl mx-auto px-4 md:px-8">

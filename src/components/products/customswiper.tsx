@@ -26,14 +26,12 @@ export default function HeroSlider() {
           <SwiperSlide key={slide.id}>
             <div className="w-full h-full p-0 ">
               <div className="relative w-full h-full min-h-[350px] md:h-[450px]  overflow-hidden bg-primary">
-               
                 <img
                   src={slide.imageMobile}
                   alt="slider image mobile"
                   className="block md:hidden w-full h-full object-contain"
                 />
 
-               
                 <img
                   src={slide.imageDesktop}
                   alt="slider image desktop"
