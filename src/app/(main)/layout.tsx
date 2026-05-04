@@ -1,6 +1,7 @@
-// app/layout.tsx
+import Header from "@/src/shared/components/Header";
+import { Footer } from "@/src/shared/components/Footer";
 import type { Metadata } from "next";
-import "../globals.css"; // مسیر این فایل را بر اساس پوشه‌بندی خود چک کنید
+import "../globals.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,13 +14,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html>
       <body className="min-h-full flex flex-col">
-        <div>HeaderUser</div>
+        <Header />
 
-        <main className="w-full mx-auto container flex-grow">{children}</main>
+        <main className="w-full mx-auto">{children}</main>
 
-        <div>FooterUser</div>
+        <Footer />
       </body>
     </html>
   );

@@ -13,7 +13,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={` h-full antialiased`}>
+    <html >
       <body className="min-h-full flex flex-col">
         <div>HeaderAdmin</div>
         <div className="w-full mx-auto container">{children}</div>

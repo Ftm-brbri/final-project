@@ -1,3 +1,9 @@
+import HeroSlider from "@/src/components/products/customswiper";
+
 export default function Page() {
-  return <div>Home</div>;
+  return (
+    <div>
+      <HeroSlider/>
+    </div>
+  );
 }
