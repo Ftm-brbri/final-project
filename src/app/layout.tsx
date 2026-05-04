@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html>
       <body className="bg-gray-50 text-gray-900 font-sans antialiased">
-        {/* اضافه شدن StoreProvider */}
+      
         <StoreProvider>{children}</StoreProvider>
       </body>
     </html>

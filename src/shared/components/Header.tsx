@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-// import { FaSearch } from "react-icons/fa";
 
 
 const items = [
