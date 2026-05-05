@@ -1,6 +1,45 @@
+"use client";
+
 import { Users, ShoppingBag, Banknote } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+const ADMIN_TOKEN_KEY = "admin_token";
+const ADMIN_USER_KEY = "admin_user";
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    const token = window.localStorage.getItem(ADMIN_TOKEN_KEY);
+    const rawUser = window.localStorage.getItem(ADMIN_USER_KEY);
+    if (!token || !rawUser) {
+      router.replace("/login-admin");
+      return;
+    }
+
+    try {
+      const user = JSON.parse(rawUser) as { role?: string };
+      if (user?.role !== "admin") {
+        router.replace("/login-admin");
+        return;
+      }
+    } catch {
+      router.replace("/login-admin");
+      return;
+    }
+    setIsChecking(false);
+  }, [router]);
+
+  if (isChecking) {
+    return (
+      <div className="flex items-center justify-center min-h-[40vh]">
+        <div className="text-slate-500">در حال بررسی...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-slate-800">داشبورد مدیریت</h1>

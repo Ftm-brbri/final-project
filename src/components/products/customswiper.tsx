@@ -21,7 +21,7 @@ export default function HeroSlider() {
           delay: 4000,
           disableOnInteraction: false,
         }}
-        loop
+        rewind
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>

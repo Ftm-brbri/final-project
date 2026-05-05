@@ -10,8 +10,10 @@ import {
   LogOut,
   Globe,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function AdminSidebar() {
+  const router = useRouter();
   const menuItems = [
     {
       name: "داشبورد",
@@ -64,7 +66,10 @@ export default function AdminSidebar() {
         >
           <Globe size={18} /> ورود به سایت
         </Link>
-        <button className="flex w-full items-center justify-center gap-2 px-3 py-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors">
+        <button onClick={()=>{
+          localStorage.removeItem("admin_token");
+          router.push("/login-admin");
+        }} className="flex w-full items-center justify-center gap-2 px-3 py-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors">
           <LogOut size={18} /> خروج از حساب
         </button>
       </div>
