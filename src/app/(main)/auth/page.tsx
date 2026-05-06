@@ -1,3 +1,11 @@
+import SignIn from "@/src/components/auth/signin";
+
+
 export default function Page() {
-  return <div>authentication</div>;
+  return (
+    <div>
+      <SignIn />
+      
+    </div>
+  );
 }

@@ -18,7 +18,7 @@ function SignUp() {
   return (
     <div
       dir="rtl"
-      className="flex items-center max-w-100 rounded-2xl bg-white mx-auto border-secondary shadow-[0px_5px_10px_5px_rgba(0,0,0,0.2)] my-10 "
+      className="flex items-center max-w-100 rounded-2xl bg-white mx-auto border-primary shadow-[0px_5px_10px_5px_rgba(0,0,0,0.2)] my-10 "
     >
       <form onSubmit={handleSubmit(onSubmit)} className="w-full p-4">
         <div
@@ -33,7 +33,7 @@ function SignUp() {
           <input
             type="text"
             {...register("userName")}
-            className="border-2 border-secondary w-full rounded-md px-1.5 py-1 outline-none"
+            className="border-2 border-primary w-full rounded-md px-1.5 py-1 outline-none"
           />
           {errors.userName && (
             <span className="text-xs text-red-400">
@@ -46,7 +46,7 @@ function SignUp() {
           <input
             type="password"
             {...register("password")}
-            className="border-2 border-secondary w-full rounded-md px-1.5 py-1 outline-none"
+            className="border-2 border-primary w-full rounded-md px-1.5 py-1 outline-none"
           />
           {errors.password && (
             <span className="text-xs text-red-400">
@@ -59,7 +59,7 @@ function SignUp() {
           <input
             type="password"
             {...register("repeatPassword")}
-            className="border-2 border-secondary w-full rounded-md px-1.5 py-1 outline-none"
+            className="border-2 border-primary w-full rounded-md px-1.5 py-1 outline-none"
           />
           {errors.repeatPassword && (
             <span className="text-xs text-red-400">
@@ -69,7 +69,7 @@ function SignUp() {
         </div>
         <button
           type="submit"
-          className="bg-secondary text-white  text-lg flex items-center justify-center py-1 rounded-md my-4.5 w-full hover:bg-text cursor-pointer"
+          className="bg-primary text-white  text-lg flex items-center justify-center py-1 rounded-md my-4.5 w-full hover:bg-text cursor-pointer"
         >
           ثبت نام
         </button>

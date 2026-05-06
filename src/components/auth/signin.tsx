@@ -28,7 +28,7 @@ function SignIn() {
           <input
             type="text"
             {...register("userName")}
-            className="border-2 border-secondary w-full rounded-md px-1.5 py-1 outline-none"
+            className="border-2 border-primary w-full rounded-md px-1.5 py-1 outline-none"
           />
           {errors.userName && (
             <span className="text-xs text-red-400">
@@ -41,7 +41,7 @@ function SignIn() {
           <input
             type="password"
             {...register("password")}
-            className="border-2 border-secondary w-full rounded-md px-1.5 py-1 outline-none"
+            className="border-2 border-primary w-full rounded-md px-1.5 py-1 outline-none"
           />
           {errors.password && (
             <span className="text-xs text-red-400">
@@ -51,7 +51,7 @@ function SignIn() {
         </div>
         <button
           type="submit"
-          className="bg-secondary text-white
+          className="bg-primary text-white
          text-lg flex items-center justify-center py-1 rounded-md my-4.5 w-full hover:bg-text cursor-pointer"
         >
           ورود
