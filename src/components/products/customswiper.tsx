@@ -7,7 +7,7 @@ import Image from "next/image";
 
 export default function HeroSlider() {
   return (
-    <div className="relative pb-16">
+    <div className="relative w-full h-screen pb-0">
       <Swiper
         dir="ltr"
         className="hero-swiper"

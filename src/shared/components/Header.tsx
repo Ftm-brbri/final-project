@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-
+import Image from "next/image";
 
 const items = [
   { label: "خانه", href: "/" },
@@ -13,26 +13,30 @@ const items = [
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const [openBrand, setOpenBrand] = useState(false);
+  // const [openBrand, setOpenBrand] = useState(false);
 
   return (
     <section
-      className="w-full bg-white text-md font-semibold z-50 relative shadow-sm"
+      className="absolute top-0 left-0 w-full bg-transparent text-md font-semibold z-50"
       dir="rtl"
     >
       <div className="flex items-center justify-between px-4 md:px-8 py-3 md:py-4 gap-4">
         <div className="flex items-center gap-3">
-          <img
+          <Image
             src="./image/burger-menu-svgrepo-com.svg"
             alt="burger-menu"
-            className="md:hidden w-7 h-7 cursor-pointer"
+            width={7}
+            height={7}
+            className="md:hidden width-7 h-7 cursor-pointer"
             onClick={() => setIsOpen(true)}
           />
           <Link href="/">
-            <img
+            <Image
               src="./image/og-sportex.png"
               alt="logo"
-              className="h-20 w-20 md:h-30 md:w-30 object-contain outline-none"
+              width={20}
+              height={20}
+              className="h-20 width-20 md:h-30 md:w-30 object-contain outline-none"
             />
           </Link>
         </div>
@@ -131,7 +135,7 @@ function Navbar() {
           ورود / ثبت نام
         </button>
       </Link>
-      {/* <img
+      {/* <Image
         src="./image/cart-large-2-svgrepo-com.svg"
         alt="cart"
         className="w-6 h-6 md:w-8 md:h-8 cursor-pointer"
