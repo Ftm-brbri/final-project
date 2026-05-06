@@ -5,8 +5,8 @@ import {
   ShoppingBag,
   Package,
   DollarSign,
-  FileText,
-  Settings,
+  // FileText,
+  // Settings,
   LogOut,
   Globe,
 } from "lucide-react";

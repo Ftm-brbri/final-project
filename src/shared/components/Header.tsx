@@ -5,8 +5,8 @@ import { useState } from "react";
 
 const items = [
   { label: "خانه", href: "/" },
-  { label: "فروشگاه", href: "/product" },
-  { label: "انواع محصولات", href: "/" },
+  // { label: "فروشگاه", href: "/product" },
+  { label: " محصولات", href: "/" },
   { label: "برندها", href: "/brand" },
   { label: "تماس با ما", href: "/" },
 ];
@@ -17,7 +17,7 @@ export default function Header() {
 
   return (
     <section
-      className="w-full bg-white text-sm z-50 relative shadow-sm"
+      className="w-full bg-white text-md font-semibold z-50 relative shadow-sm"
       dir="rtl"
     >
       <div className="flex items-center justify-between px-4 md:px-8 py-3 md:py-4 gap-4">
@@ -32,18 +32,18 @@ export default function Header() {
             <img
               src="./image/og-sportex.png"
               alt="logo"
-              className="h-15 w-15 md:h-25 md:w-25 object-contain outline-none"
+              className="h-20 w-20 md:h-30 md:w-30 object-contain outline-none"
             />
           </Link>
         </div>
 
-        <div className="hidden md:flex flex-1 max-w-2xl mx-4 border-2 border-gray-200 rounded-md overflow-hidden">
-          <div className="px-4 bg-secondary flex items-center cursor-pointer">
+        <div className="hidden md:flex flex-1 max-w-2xl mx-4 border-2 border-primary rounded-md overflow-hidden">
+          <div className="px-4 bg-primary flex items-center cursor-pointer">
             {/* <FaSearch className="text-white" /> */}
           </div>
           <input
             type="text"
-            placeholder="جستجوی محصولات"
+            placeholder="کلمه مدنظر خود را وارد کنید"
             className="flex-1 px-4 py-2.5 outline-none text-sm lg:text-base"
           />
           <div className="px-4 flex items-center border-r border-gray-200 text-gray-600 bg-gray-50">
@@ -59,7 +59,7 @@ export default function Header() {
       </div>
 
       <div className="md:hidden px-4 pb-4 w-full">
-        <div className="flex border-2 border-gray-200 rounded-md overflow-hidden w-full">
+        <div className="flex border-2 border-primary rounded-md overflow-hidden w-full">
           <div className="px-3 bg-secondary flex items-center">
             {/* <FaSearch className="text-white" /> */}
           </div>
@@ -71,7 +71,7 @@ export default function Header() {
         </div>
       </div>
 
-      <div className="hidden md:block border-t border-gray-200">
+      <div className="hidden md:block border-t border-primary">
         <ul className="max-w-5xl mx-auto flex justify-center gap-10 lg:gap-16 py-4">
           {items.map((item, index) => (
             <li key={index} className="hover:text-primary transition-colors">
@@ -127,15 +127,15 @@ function Navbar() {
   return (
     <div className="flex gap-2 md:gap-4 items-center">
       <Link href={"/auth"}>
-        <button className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors rounded-md px-3 py-1.5 md:p-2 text-xs md:text-sm whitespace-nowrap">
+        <button className="border-2 border-primary text-gray-700 hover:bg-gray-50 transition-colors rounded-md px-3 py-1.5 md:p-2 text-xs md:text-sm whitespace-nowrap">
           ورود / ثبت نام
         </button>
       </Link>
-      <img
+      {/* <img
         src="./image/cart-large-2-svgrepo-com.svg"
         alt="cart"
         className="w-6 h-6 md:w-8 md:h-8 cursor-pointer"
-      />
+      /> */}
     </div>
   );
 }
