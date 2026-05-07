@@ -1,6 +1,7 @@
 "use client";
+
 import { format } from "date-fns-jalali";
-import { User, Clock } from "lucide-react";
+import { Bell, Clock3, Search, User } from "lucide-react";
 
 export default function AdminHeader() {
   const currentDate = format(new Date(), "yyyy/MM/dd - HH:mm");
@@ -8,19 +9,46 @@ export default function AdminHeader() {
   return (
     <header
       dir="rtl"
-      className="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center "
+      className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-xl"
     >
-      <div className="flex items-center gap-4">
-        <span className="font-medium text-slate-700 ">سلام ادمین عزیز!</span>
-        <div className="bg-slate-100 p-2 rounded-full text-slate-600">
-          <User size={24} />
+      <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-400 text-white shadow-lg shadow-orange-500/30">
+            <User size={22} />
+          </div>
+
+          <div>
+            <h1 className="text-lg font-bold text-slate-800">
+              سلام ادمین عزیز 👋
+            </h1>
+            <p className="text-sm text-slate-500">
+              مدیریت فروشگاه ورزشی اسپرتکس
+            </p>
+          </div>
         </div>
-      </div>
-      <div className="flex items-center gap-2 text-slate-500">
-        <Clock size={18} />
-        <span className="text-sm" dir="ltr">
-          {currentDate}
-        </span>
+
+        <div className="flex items-center gap-4">
+          <div className="hidden items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 lg:flex">
+            <Search size={18} className="text-slate-400" />
+            <input
+              type="text"
+              placeholder="جستجو در پنل مدیریت..."
+              className="bg-transparent text-sm outline-none placeholder:text-slate-400"
+            />
+          </div>
+
+          <button className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-100">
+            <Bell size={20} />
+            <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-red-500" />
+          </button>
+
+          <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-600 shadow-sm">
+            <Clock3 size={18} />
+            <span className="text-sm font-medium" dir="ltr">
+              {currentDate}
+            </span>
+          </div>
+        </div>
       </div>
     </header>
   );
