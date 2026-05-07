@@ -44,13 +44,13 @@ export default function Header() {
             </ul>
           </div>
 
-          <div className="hidden lg:flex max-w-2xl mx-4 rounded-md overflow-hidden border-b shadow-2xl bg-white">
+          <div className="hidden lg:flex max-w-2xl mx-4 rounded-md overflow-hidden border-b shadow-2xl bg-transparent">
             <input
               type="text"
               placeholder="جستجو در اسپرتکس…"
               className="px-4 py-2.5 outline-none text-sm lg:text-base w-full"
             />
-            <div className="px-4 flex items-center border-r border-gray-200 text-gray-600 bg-gray-50">
+            <div className="px-4 flex items-center border-r border-gray-200 text-gray-600 bg-gray-200">
               <select className="bg-transparent outline-none cursor-pointer">
                 <option>دسته بندی</option>
               </select>
@@ -93,7 +93,7 @@ export default function Header() {
             <input
               type="text"
               placeholder="جستجو در اسپرتکس…"
-              className="w-full px-3 py-2 outline-none text-sm hover:bg-primary"
+              className="w-full px-3 py-2 outline-none text-sm "
             />
           </div>
         </div>
@@ -107,7 +107,7 @@ export default function Header() {
               <Link
                 href={item.href}
        
-                className="block px-6 py-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                className="block px-6 py-4 text-gray-700 hover:bg-primary transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 {item.label}
@@ -124,7 +124,7 @@ function Navbar() {
   return (
     <div className="flex gap-2 lg:gap-4 items-center">
       <Link href={"/auth"}>
-        <button className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors rounded-md px-3 py-1.5 md:p-2 text-xs md:text-sm font-semibold whitespace-nowrap bg-white">
+        <button className="border-2 border-gray-300 text-gray-700 hover:bg-white transition-colors rounded-md px-3 py-1.5 md:p-2 text-xs md:text-sm font-semibold whitespace-nowrap bg-transparent ">
           ورود / ثبت نام
         </button>
       </Link>

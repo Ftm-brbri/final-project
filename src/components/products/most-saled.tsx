@@ -3,7 +3,7 @@ export function MostSaled() {
   return (
     <div className="w-full bg-primary py-10 md:py-16 mt-10">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
-        <div className="flex col lg:flex-row items-center lg:items-stretch gap-8 lg:gap-12">
+        <div className="flex flex-col lg:flex-row items-center lg:items-stretch gap-8 lg:gap-12">
           <div className="flex flex-col justify-center items-center gap-6 min-w-50">
             <div className="text-white text-xl md:text-2xl font-bold px-5 text-center">
               پرفروش ترین ها

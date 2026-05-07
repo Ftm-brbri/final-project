@@ -41,7 +41,7 @@ export default function HeroSlider() {
           </SwiperSlide>
         ))}
       </Swiper>
-      <div className="hero-pagination flex justify-center gap-1.5 mt-8"></div>
+      <div className="hero-pagination absolute bottom-6 w-full z-10 flex justify-center gap-1.5 [&_.swiper-pagination-bullet]:bg-gray-300 [&_.swiper-pagination-bullet]:opacity-100 [&_.swiper-pagination-bullet-active]!bg-gray-700"></div>
     </div>
   );
 }
