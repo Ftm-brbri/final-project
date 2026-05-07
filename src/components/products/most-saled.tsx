@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 export function MostSaled() {
   return (
     <div className="w-full bg-primary py-10 md:py-16 mt-10">
@@ -15,7 +15,7 @@ export function MostSaled() {
 
           <div className="flex overflow-x-auto overflow-visible gap-5 pb-4 w-full snap-x">
             <div className="bg-white min-w-55 sm:min-w-62.5 shrink-0 snap-center rounded-2xl cursor-pointer hover:-translate-y-2 transition-transform duration-300 overflow-hidden shadow-lg">
-              <Image
+              <img
                 className="h-48 w-full object-cover"
                 src="/image/pro_56532_558.webp"
                 alt="DK.1.12689-5"
@@ -29,12 +29,12 @@ export function MostSaled() {
               </div>
             </div>
             <div className="bg-white min-w-55 sm:min-w-62.5 shrink-0 snap-center rounded-2xl cursor-pointer hover:-translate-y-2 transition-transform duration-300 overflow-hidden shadow-lg">
-              <Image
+              <img
                 className="h-48 w-full object-cover"
                 src="/image/pro_61092_558.webp"
                 alt="DK.1.12689-5"
               />
-              <div className="p-4 flex col gap-2">
+              <div className="p-4 flex flex-col gap-2">
                 <p className="text-gray-950 font-semibold truncate">
                  کفش والیبال زنانه اسیکس
                 </p>
@@ -43,12 +43,12 @@ export function MostSaled() {
               </div>
             </div>
             <div className="bg-white min-w-55 sm:min-w-62.5 shrink-0 snap-center rounded-2xl cursor-pointer hover:-translate-y-2 transition-transform duration-300 overflow-hidden shadow-lg">
-              <Image
+              <img
                 className="h-48 w-full object-cover"
                 src="/image/pro_56418_558.webp"
                 alt="DK.1.12689-5"
               />
-              <div className="p-4 flex col gap-2">
+              <div className="p-4 flex flex-col gap-2">
                 <p className="text-gray-950 font-semibold truncate">
                   کفش ورزشی مردانه اسپورتلند
                 </p>
@@ -58,12 +58,12 @@ export function MostSaled() {
             </div>
 
             <div className="bg-white min-w-55 sm:min-w-62.5 shrink-0 snap-center rounded-2xl cursor-pointer hover:-translate-y-2 transition-transform duration-300 overflow-hidden shadow-lg">
-              <Image
+              <img
                 className="h-48 w-full object-cover"
                 src="/image/pro_56701_558.webp"
                 alt="ORIENT-RA-AB0E14N1BD"
               />
-              <div className="p-4 flex col gap-2">
+              <div className="p-4 flex flex-col gap-2">
                 <p className="text-gray-950 font-semibold truncate">
                   تی شرت اسپرت مردانه نایک
                 </p>
@@ -73,12 +73,12 @@ export function MostSaled() {
             </div>
 
             <div className="bg-white min-w-55 sm:min-w-62.5 shrink-0 snap-center rounded-2xl cursor-pointer hover:-translate-y-2 transition-transform duration-300 overflow-hidden shadow-lg">
-              <Image
+              <img
                 alt="CITIZEN-CA4610-85Z"
                 className="h-48 w-full object-cover"
                 src="/image/pro_56785_558.webp"
               />
-              <div className="p-4 flex col gap-2">
+              <div className="p-4 flex flex-col gap-2">
                 <p className="text-gray-950 font-semibold truncate">
                   کفش پیاده روی مردانه اسپورتلند
                 </p>
@@ -88,7 +88,7 @@ export function MostSaled() {
             </div>
 
             <div className="bg-white min-w-55 sm:min-w-62.5 shrink-0 snap-center rounded-2xl cursor-pointer hover:-translate-y-2 transition-transform duration-300 overflow-hidden shadow-lg">
-              <Image
+              <img
                 alt="CASIO-LTP"
                 className="h-48 w-full object-cover"
                 src="/image/pro_59512_558.webp"

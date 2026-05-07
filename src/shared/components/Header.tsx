@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import Image from "next/image";
+
 
 const items = [
   { label: "خانه", href: "/" },
@@ -22,27 +22,25 @@ export default function Header() {
     >
       <div className="flex items-center justify-between px-4 md:px-8 py-3 md:py-4 gap-4">
         <div className="flex items-center gap-3">
-          <Image
+          <img
             src="./image/burger-menu-svgrepo-com.svg"
             alt="burger-menu"
-            width={7}
-            height={7}
+           
             className="md:hidden width-7 h-7 cursor-pointer"
             onClick={() => setIsOpen(true)}
           />
           <Link href="/">
-            <Image
+            <img
               src="./image/og-sportex.png"
               alt="logo"
-              width={20}
-              height={20}
-              className="h-20 width-20 md:h-30 md:w-30 object-contain outline-none"
+  
+              className="h-10 width-15 md:h-30 md:w-30 object-contain outline-none"
             />
           </Link>
         </div>
 
-        <div className="hidden md:flex flex-1 max-w-2xl mx-4 border-2 border-primary rounded-md overflow-hidden">
-          <div className="px-4 bg-primary flex items-center cursor-pointer">
+        <div className="hidden md:flex flex-1 max-w-2xl mx-4 border-2 border-gray-300 rounded-md overflow-hidden">
+          <div className="px-4  flex items-center cursor-pointer">
             {/* <FaSearch className="text-white" /> */}
           </div>
           <input
@@ -50,11 +48,11 @@ export default function Header() {
             placeholder="کلمه مدنظر خود را وارد کنید"
             className="flex-1 px-4 py-2.5 outline-none text-sm lg:text-base"
           />
-          <div className="px-4 flex items-center border-r border-gray-200 text-gray-600 bg-gray-50">
+          {/* <div className="px-4 flex items-center border-r border-gray-200 text-gray-600 bg-gray-50">
             <select className="bg-transparent outline-none cursor-pointer">
               <option>دسته بندی</option>
             </select>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex items-center">
@@ -63,7 +61,7 @@ export default function Header() {
       </div>
 
       <div className="md:hidden px-4 pb-4 w-full">
-        <div className="flex border-2 border-primary rounded-md overflow-hidden w-full">
+        <div className="flex border-2 border-gray-300 rounded-md overflow-hidden w-full">
           <div className="px-3 bg-secondary flex items-center">
             {/* <FaSearch className="text-white" /> */}
           </div>
@@ -75,7 +73,7 @@ export default function Header() {
         </div>
       </div>
 
-      <div className="hidden md:block border-t border-primary">
+      <div className="hidden md:block border-t border-gray-300">
         <ul className="max-w-5xl mx-auto flex justify-center gap-10 lg:gap-16 py-4">
           {items.map((item, index) => (
             <li key={index} className="hover:text-primary transition-colors">
@@ -131,7 +129,7 @@ function Navbar() {
   return (
     <div className="flex gap-2 md:gap-4 items-center">
       <Link href={"/auth"}>
-        <button className="border-2 border-primary text-gray-700 hover:bg-gray-50 transition-colors rounded-md px-3 py-1.5 md:p-2 text-xs md:text-sm whitespace-nowrap">
+        <button className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors rounded-md px-3 py-1.5 md:p-2 text-xs md:text-sm whitespace-nowrap">
           ورود / ثبت نام
         </button>
       </Link>

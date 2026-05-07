@@ -1,10 +1,9 @@
-import Image from "next/image";
 export function Footer() {
   return (
     <footer dir="rtl" className="bg-primary text-gray-200 w-full mt-10 ">
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 text-black">
         <div className="flex flex-col items-center sm:items-start text-center sm:text-right ">
-          <Image
+          <img
             src="./image/og-sportex.png"
             alt="Sportex logo"
             className="w-24 md:w-30 mb-4 rounded-3xl"

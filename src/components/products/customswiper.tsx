@@ -3,7 +3,7 @@
 import { Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { slides } from "../../constants/swiper-slides";
-import Image from "next/image";
+
 
 export default function HeroSlider() {
   return (
@@ -26,13 +26,13 @@ export default function HeroSlider() {
           <SwiperSlide key={slide.id}>
             <div className="w-full h-full p-0 ">
               <div className="relative w-full h-full min-h-87.5 md:h-112.5 overflow-hidden bg-primary">
-                <Image
+                <img
                   src={slide.imageMobile}
                   alt="slider image mobile"
                   className="block md:hidden w-full h-full object-contain"
                 />
 
-                <Image
+                <img
                   src={slide.imageDesktop}
                   alt="slider image desktop"
                   className="hidden md:block w-full h-full object-cover"
