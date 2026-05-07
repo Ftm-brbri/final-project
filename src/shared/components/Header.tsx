@@ -3,38 +3,38 @@ import Link from "next/link";
 import { useState } from "react";
 
 const items = [
-  { label: "خانه", href: "/" },
-
-  { label: " محصولات", href: "/" },
+  { label: "محصولات", href: "/" },
   { label: "برندها", href: "/brand" },
   { label: "تماس با ما", href: "/" },
 ];
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  // const [openBrand, setOpenBrand] = useState(false);
 
   return (
     <section
-      className="absolute top-0 left-0 w-full bg-transparent text-md font-semibold z-50"
+      className="absolute top-0 left-0 w-full bg-[#282b3318] text-md font-semibold z-50"
       dir="rtl"
     >
-      <div className="flex items-center justify-between px-4 md:px-8 py-3 md:py-4 gap-4">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between px-4 lg:px-8 py-3 lg:py-4 gap-4">
+        <div className="flex items-center gap-3 w-full lg:w-auto">
+          
           <img
             src="./image/burger-menu-svgrepo-com.svg"
             alt="burger-menu"
-            className="md:hidden width-7 h-7 cursor-pointer"
+            className="lg:hidden w-7 h-7 cursor-pointer"
             onClick={() => setIsOpen(true)}
           />
           <Link href="/">
             <img
               src="./image/og-sportex.png"
               alt="logo"
-              className="h-10 w-15 md:h-fit md:w-30 object-contain rounded-2xl outline-none "
+              className="h-10 w-auto lg:h-12 object-contain rounded-md lg:rounded-2xl outline-none"
             />
           </Link>
-          <div className="hidden md:block ">
+
+         
+          <div className="hidden lg:block">
             <ul className="max-w-5xl mx-auto flex justify-center gap-10 lg:gap-16 py-4 pr-8">
               {items.map((item, index) => (
                 <li key={index} className="hover:text-white transition-colors">
@@ -43,14 +43,12 @@ export default function Header() {
               ))}
             </ul>
           </div>
-          <div className="hidden md:flex max-w-2xl mx-4 rounded-md overflow-hidden border-b shadow-2xl">
-            <div className="px-4  flex items-center cursor-pointer">
-              {/* <FaSearch className="text-white" /> */}
-            </div>
+
+          <div className="hidden lg:flex max-w-2xl mx-4 rounded-md overflow-hidden border-b shadow-2xl bg-white">
             <input
               type="text"
               placeholder="جستجو در اسپرتکس…"
-              className="flex-1 px-4 py-2.5 outline-none text-sm lg:text-base"
+              className="px-4 py-2.5 outline-none text-sm lg:text-base w-full"
             />
             <div className="px-4 flex items-center border-r border-gray-200 text-gray-600 bg-gray-50">
               <select className="bg-transparent outline-none cursor-pointer">
@@ -65,40 +63,41 @@ export default function Header() {
         </div>
       </div>
 
-      <div className="md:hidden px-4 pb-4 w-full">
-        <div className="flex border-2 border-gray-300 rounded-md overflow-hidden w-full">
-          <div className="px-3 bg-secondary flex items-center">
-            {/* <FaSearch className="text-white" /> */}
-          </div>
-          <input
-            type="text"
-            placeholder="جستجوی محصولات..."
-            className="flex-1 px-3 py-2 outline-none text-sm"
-          />
-        </div>
-      </div>
-
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setIsOpen(false)}
         ></div>
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-[65%] sm:w-[50%] bg-white z-50 transform transition-transform duration-300 ease-in-out md:hidden shadow-xl ${
+        className={`fixed top-0 right-0 h-full w-[75%] sm:w-[50%] md:w-[40%] bg-white z-50 transform transition-transform duration-300 ease-in-out lg:hidden shadow-xl ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-          <span className="font-bold text-base">منوی دسترسی</span>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="text-2xl font-bold text-gray-500 hover:text-red-500"
-          >
-            &times;
-          </button>
+        <div className="p-4 border-b border-gray-200 bg-gray-50 flex flex-col gap-4">
+          <div className="flex justify-between items-center w-full">
+            <span className="font-bold text-base text-gray-800">
+              منوی دسترسی
+            </span>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-3xl leading-none font-bold text-gray-500 hover:text-red-500"
+            >
+              &times;
+            </button>
+          </div>
+
+
+          <div className="w-full rounded-md overflow-hidden border-b border-gray-500 shadow-md bg-white flex">
+            <input
+              type="text"
+              placeholder="جستجو در اسپرتکس…"
+              className="w-full px-3 py-2 outline-none text-sm hover:bg-primary"
+            />
+          </div>
         </div>
+
         <ul className="flex flex-col py-2">
           {items.map((item, index) => (
             <li
@@ -107,7 +106,8 @@ export default function Header() {
             >
               <Link
                 href={item.href}
-                className="block px-6 py-4 hover:bg-gray-50 active:bg-gray-100"
+       
+                className="block px-6 py-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 {item.label}
@@ -122,17 +122,12 @@ export default function Header() {
 
 function Navbar() {
   return (
-    <div className="flex gap-2 md:gap-4 items-center">
+    <div className="flex gap-2 lg:gap-4 items-center">
       <Link href={"/auth"}>
-        <button className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors rounded-md px-3 py-1.5 md:p-2 text-xs md:text-sm whitespace-nowrap">
+        <button className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors rounded-md px-3 py-1.5 md:p-2 text-xs md:text-sm font-semibold whitespace-nowrap bg-white">
           ورود / ثبت نام
         </button>
       </Link>
-      {/* <Image
-        src="./image/cart-large-2-svgrepo-com.svg"
-        alt="cart"
-        className="w-6 h-6 md:w-8 md:h-8 cursor-pointer"
-      /> */}
     </div>
   );
 }

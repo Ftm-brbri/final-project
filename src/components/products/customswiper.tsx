@@ -6,7 +6,7 @@ import { slides } from "../../constants/swiper-slides";
 
 export default function HeroSlider() {
   return (
-    <div className="relative w-full h-screen pb-0">
+    <div className="relative w-full h-fit pb-0">
       <Swiper
         dir="ltr"
         className="hero-swiper"
