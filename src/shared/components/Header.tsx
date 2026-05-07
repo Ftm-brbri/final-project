@@ -2,10 +2,9 @@
 import Link from "next/link";
 import { useState } from "react";
 
-
 const items = [
   { label: "خانه", href: "/" },
-  // { label: "فروشگاه", href: "/product" },
+
   { label: " محصولات", href: "/" },
   { label: "برندها", href: "/brand" },
   { label: "تماس با ما", href: "/" },
@@ -25,7 +24,6 @@ export default function Header() {
           <img
             src="./image/burger-menu-svgrepo-com.svg"
             alt="burger-menu"
-           
             className="md:hidden width-7 h-7 cursor-pointer"
             onClick={() => setIsOpen(true)}
           />
@@ -33,26 +31,33 @@ export default function Header() {
             <img
               src="./image/og-sportex.png"
               alt="logo"
-  
-              className="h-10 width-15 md:h-30 md:w-30 object-contain outline-none"
+              className="h-10 w-15 md:h-fit md:w-30 object-contain rounded-2xl outline-none "
             />
           </Link>
-        </div>
-
-        <div className="hidden md:flex flex-1 max-w-2xl mx-4 border-2 border-gray-300 rounded-md overflow-hidden">
-          <div className="px-4  flex items-center cursor-pointer">
-            {/* <FaSearch className="text-white" /> */}
+          <div className="hidden md:block ">
+            <ul className="max-w-5xl mx-auto flex justify-center gap-10 lg:gap-16 py-4 pr-8">
+              {items.map((item, index) => (
+                <li key={index} className="hover:text-white transition-colors">
+                  <Link href={item.href}>{item.label}</Link>
+                </li>
+              ))}
+            </ul>
           </div>
-          <input
-            type="text"
-            placeholder="کلمه مدنظر خود را وارد کنید"
-            className="flex-1 px-4 py-2.5 outline-none text-sm lg:text-base"
-          />
-          {/* <div className="px-4 flex items-center border-r border-gray-200 text-gray-600 bg-gray-50">
-            <select className="bg-transparent outline-none cursor-pointer">
-              <option>دسته بندی</option>
-            </select>
-          </div> */}
+          <div className="hidden md:flex max-w-2xl mx-4 rounded-md overflow-hidden border-b shadow-2xl">
+            <div className="px-4  flex items-center cursor-pointer">
+              {/* <FaSearch className="text-white" /> */}
+            </div>
+            <input
+              type="text"
+              placeholder="جستجو در اسپرتکس…"
+              className="flex-1 px-4 py-2.5 outline-none text-sm lg:text-base"
+            />
+            <div className="px-4 flex items-center border-r border-gray-200 text-gray-600 bg-gray-50">
+              <select className="bg-transparent outline-none cursor-pointer">
+                <option>دسته بندی</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center">
@@ -71,16 +76,6 @@ export default function Header() {
             className="flex-1 px-3 py-2 outline-none text-sm"
           />
         </div>
-      </div>
-
-      <div className="hidden md:block border-t border-gray-300">
-        <ul className="max-w-5xl mx-auto flex justify-center gap-10 lg:gap-16 py-4">
-          {items.map((item, index) => (
-            <li key={index} className="hover:text-primary transition-colors">
-              <Link href={item.href}>{item.label}</Link>
-            </li>
-          ))}
-        </ul>
       </div>
 
       {isOpen && (
