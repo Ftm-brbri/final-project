@@ -1,133 +1,202 @@
 "use client";
+
+import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const items = [
-  { label: "محصولات", href: "/" },
-  { label: "برندها", href: "/brand" },
-  { label: "تماس با ما", href: "/" },
+const navItems = [
+  {
+    label: "محصولات",
+    href: "/products",
+  },
+  {
+    label: "برندها",
+    href: "/brands",
+  },
+  {
+    label: "دسته‌بندی‌ها",
+    href: "/categories",
+  },
+  {
+    label: "تماس با ما",
+    href: "/contact",
+  },
 ];
-
 export default function Header() {
+  const pathname = usePathname();
+  const router = useRouter();
+
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
-    <section
-      className="absolute top-0 left-0 w-full bg-[#282b3318] text-md font-semibold z-50"
+    <header
       dir="rtl"
+      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+        isScrolled
+          ? "border-b border-white/10 bg-slate-950/85 shadow-2xl backdrop-blur-2xl"
+          : "bg-transparent"
+      }`}
     >
-      <div className="flex items-center justify-between px-4 lg:px-8 py-3 lg:py-4 gap-4">
-        <div className="flex items-center gap-3 w-full lg:w-auto">
-          
-          <img
-            src="./image/burger-menu-svgrepo-com.svg"
-            alt="burger-menu"
-            className="lg:hidden w-7 h-7 cursor-pointer"
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 md:px-8">
+        {/* Right */}
+        <div className="flex items-center gap-4 lg:gap-10">
+          {/* Mobile Menu */}
+          <button
             onClick={() => setIsOpen(true)}
-          />
-          <Link href="/">
-            <img
-              src="./image/og-sportex.png"
-              alt="logo"
-              className="h-10 w-auto lg:h-12 object-contain rounded-md lg:rounded-2xl outline-none"
+            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur-xl transition hover:bg-white/10 lg:hidden"
+          >
+            <Menu size={22} />
+          </button>
+{/* Logo */}
+          <Link href="/" className="shrink-0">
+            <Image
+              src="/image/og-sportex.png"
+              alt="Sportex"
+              width={140}
+              height={60}
+              className="h-12 w-auto rounded-2xl object-contain"
+              priority
             />
           </Link>
 
-         
-          <div className="hidden lg:block">
-            <ul className="max-w-5xl mx-auto flex justify-center gap-10 lg:gap-16 py-4 pr-8">
-              {items.map((item, index) => (
-                <li key={index} className="hover:text-white transition-colors">
-                  <Link href={item.href}>{item.label}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Desktop Nav */}
+          <nav className="hidden lg:block">
+            <ul className="flex items-center gap-8">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
 
-          <div className="hidden lg:flex max-w-2xl mx-4 rounded-md overflow-hidden border-b shadow-2xl bg-transparent">
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className={`relative text-sm font-bold transition ${
+                        isActive
+                          ? "text-orange-400"
+                          : "text-slate-200 hover:text-white"
+                      }`}
+                    >
+                      {item.label}
+
+                      {isActive && (
+                        <span className="absolute -bottom-2 right-0 h-[3px] w-full rounded-full bg-orange-500" />
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </div>
+        {/* Center Search */}
+        <div className="hidden w-full max-w-xl lg:block">
+          <div className="flex items-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl transition focus-within:border-orange-500">
+            <div className="px-4 text-slate-400">
+              <Search size={20} />
+            </div>
+
             <input
               type="text"
-              placeholder="جستجو در اسپرتکس…"
-              className="px-4 py-2.5 outline-none text-sm lg:text-base w-full"
+              placeholder="جستجو در اسپرتکس..."
+              className="w-full bg-transparent px-2 py-4 text-sm text-white outline-none placeholder:text-slate-500"
             />
-            <div className="px-4 flex items-center border-r border-gray-200 text-gray-600 bg-gray-200">
-              <select className="bg-transparent outline-none cursor-pointer">
-                <option>دسته بندی</option>
+
+            <div className="border-r border-white/10 px-4">
+              <select className="bg-transparent text-sm text-slate-300 outline-none">
+                <option className="text-black">همه دسته‌بندی‌ها</option>
+                <option className="text-black">کفش ورزشی</option>
+                <option className="text-black">لباس ورزشی</option>
+                <option className="text-black">تجهیزات</option>
               </select>
             </div>
           </div>
         </div>
+{/* Left */}
+        <div className="flex items-center gap-3">
+          <button className="hidden h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur-xl transition hover:bg-orange-500 lg:flex">
+            <ShoppingBag size={20} />
+          </button>
 
-        <div className="flex items-center">
-          <Navbar />
+          <button
+            onClick={() => router.push("/auth")}
+            className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-5 py-3 text-sm font-bold text-white shadow-xl shadow-orange-500/20 transition hover:scale-[1.03]"
+          >
+            <User size={18} />
+            ورود / ثبت‌نام
+          </button>
         </div>
       </div>
 
+      {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setIsOpen(false)}
-        ></div>
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+        />
       )}
 
+      {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-[75%] sm:w-[50%] md:w-[40%] bg-white z-50 transform transition-transform duration-300 ease-in-out lg:hidden shadow-xl ${
+        className={`fixed right-0 top-0 z-50 flex h-full w-[85%] max-w-sm flex-col bg-slate-950 p-6 shadow-2xl transition-transform duration-300 lg:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="p-4 border-b border-gray-200 bg-gray-50 flex flex-col gap-4">
-          <div className="flex justify-between items-center w-full">
-            <span className="font-bold text-base text-gray-800">
-              منوی دسترسی
-            </span>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-3xl leading-none font-bold text-gray-500 hover:text-red-500"
-            >
-              &times;
-            </button>
-          </div>
+        <div className="mb-8 flex items-center justify-between">
+          <Image
+            src="/image/og-sportex.png"
+            alt="Sportex"
+            width={120}
+            height={50}
+            className="h-10 w-auto"
+          />
 
-
-          <div className="w-full rounded-md overflow-hidden border-b border-gray-500 shadow-md bg-white flex">
-            <input
-              type="text"
-              placeholder="جستجو در اسپرتکس…"
-              className="w-full px-3 py-2 outline-none text-sm "
-            />
-          </div>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white"
+          >
+            <X size={22} />
+          </button>
         </div>
 
-        <ul className="flex flex-col py-2">
-          {items.map((item, index) => (
-            <li
-              key={index}
-              className="border-b border-gray-100 last:border-none"
-            >
-              <Link
-                href={item.href}
-       
-                className="block px-6 py-4 text-gray-700 hover:bg-primary transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
+        {/* Mobile Search */}
+        <nav className="flex-1">
+          <ul className="space-y-3">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
 
-function Navbar() {
-  return (
-    <div className="flex gap-2 lg:gap-4 items-center">
-      <Link href={"/auth"}>
-        <button className="border-2 border-gray-300 text-gray-700 hover:bg-white transition-colors rounded-md px-3 py-1.5 md:p-2 text-xs md:text-sm font-semibold whitespace-nowrap bg-transparent ">
-          ورود / ثبت نام
-        </button>
-      </Link>
-    </div>
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`block rounded-2xl px-5 py-4 text-sm font-bold transition ${
+                      isActive
+                        ? "bg-orange-500 text-white"
+                        : "bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </div>
+    </header>
   );
 }
