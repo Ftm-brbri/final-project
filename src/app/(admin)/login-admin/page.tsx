@@ -118,7 +118,7 @@ export default function Page() {
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
               type="text"
-              className="border-2 border-primary w-full rounded-md px-2 py-2 outline-none"
+              className="border-2 border-slate-700 w-full rounded-md px-2 py-2 outline-none"
               autoComplete="username"
             />
           </div>
@@ -129,7 +129,7 @@ export default function Page() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
-              className="border-2 border-primary w-full rounded-md px-2 py-2 outline-none"
+              className="border-2 border-slate-700 w-full rounded-md px-2 py-2 outline-none"
               autoComplete="current-password"
             />
           </div>
@@ -139,7 +139,7 @@ export default function Page() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-primary disabled:opacity-60 disabled:cursor-not-allowed text-black text-lg flex items-center justify-center py-2 rounded-md mt-6 w-full hover:bg-text hover:text-white transition-colors cursor-pointer"
+            className="bg-slate-700 hover:bg-primary disabled:opacity-60 disabled:cursor-not-allowed text-black text-lg flex items-center justify-center py-2 rounded-md mt-6 w-full hover:bg-text hover:text-white transition-colors cursor-pointer"
           >
             {isSubmitting ? "در حال ورود..." : "ورود"}
           </button>

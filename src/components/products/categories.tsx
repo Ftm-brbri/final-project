@@ -5,7 +5,7 @@ function Category() {
   const router = useRouter();
   return (
     <div className="text-center max-w-7xl px-4 md:px-8 flex flex-col items-center justify-center mx-auto my-10 md:my-16">
-      <div className="w-full max-h-150 mt-8 md:mt-5 md:flex gap-3 md:gap-6">
+      <div className="w-full mt-8 md:mt-5 md:flex gap-3 md:gap-6">
         <div>
           <img
             alt="set-image-category"
