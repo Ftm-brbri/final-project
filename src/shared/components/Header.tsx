@@ -76,7 +76,7 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden lg:block">
-            <ul className="flex items-center gap-8">
+            <ul className="flex items-center gap-5">
               {navItems.map((item) => {
                 const isActive = pathname === item.href;
 
@@ -104,7 +104,7 @@ export default function Header() {
         </div>
         {/* Center Search */}
         <div className="hidden w-full max-w-xl lg:block">
-          <div className="flex items-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl transition focus-within:border-orange-500">
+          <div className="flex items-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl transition focus-within:border-orange-500 w-90">
             <div className="px-4 text-slate-400">
               <Search size={20} />
             </div>

@@ -47,7 +47,7 @@ export default function AdminSidebar() {
     {
       name: "قیمت و موجودی",
       icon: <DollarSign size={20} />,
-      href: "/admin/inventory",
+      href: "/admin/quantity",
     },
     {
       name: "سفارشات",

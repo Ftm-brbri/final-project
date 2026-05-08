@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html dir="rtl">
+    <html dir="rtl" lang="fa">
       <body className="bg-gray-50 text-gray-900 font-sans antialiased">
         <StoreProvider>{children}</StoreProvider>
       </body>

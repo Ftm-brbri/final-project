@@ -195,7 +195,7 @@ export function MostSaled() {
               slidesPerView: 4,
             },
           }}
-          className="!overflow-visible"
+          className="!overflow-hidden"
         >
           {products.map((product) => (
             <SwiperSlide key={product.id}>

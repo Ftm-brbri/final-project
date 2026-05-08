@@ -3,21 +3,18 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
-import { Pencil, Trash2 } from "lucide-react";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
 
 type Product = {
   _id: string;
   name: string;
-
   price: number;
   stock: number;
-  category: string;
   images: string[];
 };
 
-export default function ProductsPage() {
+export default function QuantityPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -85,8 +82,6 @@ export default function ProductsPage() {
               <th className="p-3">نام محصول</th>
               <th className="p-3">قیمت</th>
               <th className="p-3">موجودی</th>
-              <th className="p-3">دسته‌بندی</th>
-              <th className="p-3">عملیات</th>
             </tr>
           </thead>
 
@@ -123,28 +118,6 @@ export default function ProductsPage() {
 
                 {/* stock */}
                 <td className="p-3">{p.stock}</td>
-
-                {/* category */}
-                <td className="p-3">{p.category}</td>
-
-                {/* actions (UI ONLY) */}
-                <td className="p-3">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => openEditModal(p)}
-                      className="rounded-lg bg-blue-100 p-2 text-blue-600 hover:bg-blue-200"
-                    >
-                      <Pencil size={16} />
-                    </button>
-
-                    <button
-                      onClick={() => openDeleteModal(p)}
-                      className="rounded-lg bg-red-100 p-2 text-red-600 hover:bg-red-200"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
               </tr>
             ))}
           </tbody>
@@ -156,63 +129,6 @@ export default function ProductsPage() {
           </div>
         )}
       </div>
-      {showEditModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="w-[400px] bg-white p-6 rounded-2xl relative">
-            <button
-              onClick={() => setShowEditModal(false)}
-              className="absolute top-2 left-2"
-            >
-              ✕
-            </button>
-
-            <h2 className="font-bold mb-4">ویرایش محصول</h2>
-            <label htmlFor="edit">edit note</label>
-            <textarea
-              name="edit note"
-              id="edit"
-              dir="ltr"
-              placeholder="write the note here!"
-              className="w-full border"
-            ></textarea>
-
-            {/* SAFE ACCESS */}
-            <p>{selectedProduct?.name}</p>
-          </div>
-        </div>
-      )}
-
-      {showDeleteModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="w-[400px] bg-white p-6 rounded-2xl relative">
-            <button
-              onClick={() => setShowDeleteModal(false)}
-              className="absolute top-2 left-2"
-            >
-              ✕
-            </button>
-
-            <h2 className="text-red-600 font-bold">حذف محصول</h2>
-
-            <p className="mt-3">آیا مطمئن هستید؟</p>
-
-            <p className="mt-2 font-semibold">{selectedProduct?.name}</p>
-
-            <div className="flex gap-3 mt-5">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="flex-1 border py-2 rounded-lg"
-              >
-                لغو
-              </button>
-
-              <button className="flex-1 bg-red-600 text-white py-2 rounded-lg">
-                حذف
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
