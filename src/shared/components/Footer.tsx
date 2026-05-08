@@ -54,7 +54,7 @@ export default function Footer() {
       <div className="absolute bottom-0 right-0 h-[250px] w-[250px] rounded-full bg-amber-400/10 blur-[100px]" />
 
       <div className="relative mx-auto max-w-7xl px-6 py-20">
-        <div className="grid grid-cols-1 gap-14 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div>
             <Image
