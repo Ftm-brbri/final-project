@@ -21,14 +21,14 @@ export default function QuantityPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // ✅ GET PRODUCTS
+
   const getProducts = async () => {
     try {
       setLoading(true);
 
       const res = await axios.get(`${API_URL}/products`);
 
-      // adjust if backend shape differs
+  
       setProducts(res.data?.data || res.data || []);
     } catch (err) {
       console.log(err);

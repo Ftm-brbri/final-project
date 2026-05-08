@@ -126,7 +126,7 @@ export default function AdminSidebar() {
 
         <button
           onClick={() => {
-            localStorage.removeItem("admin_token");
+            localStorage.clear();
             router.push("/login-admin");
           }}
           className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-500/10 px-4 py-3 text-red-400 transition hover:bg-red-500 hover:text-white"
