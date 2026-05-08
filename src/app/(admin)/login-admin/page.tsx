@@ -53,8 +53,9 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
+    console.log("here is called", isValidToken);
     if (isValidToken) {
-      router.replace("/admin");
+      router.push("/admin");
     }
   }, [isValidToken, router]);
 

@@ -71,7 +71,7 @@ function CategoryCard({
         src={item.image}
         alt={item.title}
         fill
-        className="object-cover transition duration-700 group-hover:scale-110"
+        className="object-contain transition duration-700 group-hover:scale-110"
       />
 
       {/* Overlay */}
@@ -83,9 +83,9 @@ function CategoryCard({
       {/* Content */}
       <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
         <div className="translate-y-4 transition duration-500 group-hover:translate-y-0">
-          <div className="mb-3 inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-white backdrop-blur-xl">
+          {/* <div className="mb-3 inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-white backdrop-blur-xl">
             دسته‌بندی ویژه
-          </div>
+          </div> */}
 
           <h3 className="text-2xl font-black text-white md:text-3xl">
             {item.title}
