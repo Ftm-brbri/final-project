@@ -165,8 +165,8 @@ export default function ProductsTable() {
                       product.status === "موجود"
                         ? "bg-emerald-100 text-emerald-600"
                         : product.status === "کم موجود"
-                        ? "bg-amber-100 text-amber-600"
-                        : "bg-red-100 text-red-600"
+                          ? "bg-amber-100 text-amber-600"
+                          : "bg-red-100 text-red-600"
                     }`}
                   >
                     {product.status}
