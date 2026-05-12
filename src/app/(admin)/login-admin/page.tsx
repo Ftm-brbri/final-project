@@ -166,11 +166,11 @@ export default function Page() {
         <div className="relative z-10 max-w-xl">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-5 py-2 text-sm font-semibold text-orange-400 backdrop-blur-xl">
             <ShieldCheck size={16} />
-            مدیریت حرفه‌ای فروشگاه
+            مدیریت فروشگاه
           </div>
 
           <h2 className="text-6xl font-black leading-tight text-white">
-            مدیریت حرفه‌ای
+            مدیریت
             <span className="block bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">
               فروشگاه ورزشی
             </span>
@@ -178,25 +178,25 @@ export default function Page() {
 
           <p className="mt-8 text-lg leading-9 text-slate-400">
             مدیریت سفارشات، کاربران، محصولات و تحلیل فروش فروشگاه اسپرتکس در یک
-            داشبورد مدرن و حرفه‌ای.
+            داشبورد
           </p>
 
           {/* Stats */}
           <div className="mt-14 grid grid-cols-3 gap-5">
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-              <h3 className="text-3xl font-black text-white">+12K</h3>
+              <h3 className="text-3xl font-black text-white">+۱۴K</h3>
 
               <p className="mt-2 text-sm text-slate-400">سفارش موفق</p>
             </div>
 
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-              <h3 className="text-3xl font-black text-white">98%</h3>
+              <h3 className="text-3xl font-black text-white">۹۷%</h3>
 
               <p className="mt-2 text-sm text-slate-400">رضایت مشتری</p>
             </div>
 
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-              <h3 className="text-3xl font-black text-white">24/7</h3>
+              <h3 className="text-3xl font-black text-white">۲۴/۷</h3>
 
               <p className="mt-2 text-sm text-slate-400">پشتیبانی</p>
             </div>

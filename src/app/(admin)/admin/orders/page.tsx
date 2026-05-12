@@ -8,47 +8,78 @@ const API_URL = "https://maktab-shop.runflare.run/api";
 type Order = {
   _id: string;
   totalPrice: number;
-  shippingAddress: {
-    fullName: string;
-    phoneNumber: string;
-    city: string;
+
+  shippingAddress?: {
+    fullName?: string;
+    phoneNumber?: string;
+    city?: string;
   };
+
   deliveryStatus: string;
+
   createdAt: string;
 };
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+
   const [loading, setLoading] = useState(true);
 
+  // =========================
+  // GET ORDERS
+  // =========================
   const getOrders = async () => {
     try {
       setLoading(true);
 
-      const token = localStorage.getItem("admin-token");
+      // FIXED TOKEN NAME
+      const token = localStorage.getItem("admin_token");
 
       const res = await axios.get(`${API_URL}/orders/admin/all`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+
+        params: {
+          page: 1,
+          limit: 50,
+        },
       });
 
-      setOrders(res.data?.data?.orders || res.data?.data || []);
-    } catch (err) {
-      console.log(err);
+      console.log("ORDERS RESPONSE:", res.data);
+
+      // safer response parsing
+      const ordersData =
+        res.data?.data?.orders ||
+        res.data?.data?.items ||
+        res.data?.orders ||
+        res.data?.data ||
+        [];
+
+      setOrders(Array.isArray(ordersData) ? ordersData : []);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+
+      setOrders([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // =========================
+  // FETCH ON LOAD
+  // =========================
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchOrders = async () => {
       await getOrders();
     };
 
-    fetchProducts();
+    fetchOrders();
   }, []);
 
+  // =========================
+  // LOADING
+  // =========================
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20 text-slate-500">
@@ -72,8 +103,10 @@ export default function OrdersPage() {
               <th className="p-3">ردیف</th>
               <th className="p-3">شماره سفارش</th>
               <th className="p-3">نام مشتری</th>
+              <th className="p-3">شهر</th>
               <th className="p-3">مبلغ کل</th>
               <th className="p-3">وضعیت ارسال</th>
+              <th className="p-3">تاریخ</th>
             </tr>
           </thead>
 
@@ -81,26 +114,48 @@ export default function OrdersPage() {
             {orders.map((order, index) => (
               <tr
                 key={order._id}
-                className="border-b hover:bg-slate-50 transition"
+                className="border-b transition hover:bg-slate-50"
               >
+                {/* INDEX */}
                 <td className="p-3 text-center">{index + 1}</td>
+
+                {/* ORDER ID */}
                 <td className="p-3 font-mono text-xs">{order._id}</td>
+
+                {/* CUSTOMER */}
                 <td className="p-3 font-semibold text-slate-700">
                   {order.shippingAddress?.fullName || "نامشخص"}
                 </td>
+
+                {/* CITY */}
+                <td className="p-3">{order.shippingAddress?.city || "-"}</td>
+
+                {/* PRICE */}
                 <td className="p-3">
                   {order.totalPrice?.toLocaleString()} تومان
                 </td>
+
+                {/* STATUS */}
                 <td className="p-3">
                   {order.deliveryStatus === "pending"
                     ? "در انتظار"
-                    : order.deliveryStatus}
+                    : order.deliveryStatus === "shipped"
+                      ? "ارسال شده"
+                      : order.deliveryStatus === "delivered"
+                        ? "تحویل شده"
+                        : order.deliveryStatus}
+                </td>
+
+                {/* DATE */}
+                <td className="p-3 text-xs text-slate-500">
+                  {new Date(order.createdAt).toLocaleDateString("fa-IR")}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
 
+        {/* EMPTY */}
         {orders.length === 0 && (
           <div className="py-10 text-center text-slate-500">
             سفارشی یافت نشد

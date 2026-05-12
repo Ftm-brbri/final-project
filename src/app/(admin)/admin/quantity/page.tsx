@@ -5,6 +5,7 @@ import axios from "axios";
 import Image from "next/image";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
+const IMAGE_BASE_URL = "https://maktab-shop.runflare.run";
 
 type Product = {
   _id: string;
@@ -14,37 +15,64 @@ type Product = {
   images: string[];
 };
 
+type EditableFields = {
+  price: number;
+  stock: number;
+};
+
 export default function QuantityPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const [loading, setLoading] = useState(true);
 
+  const [saving, setSaving] = useState(false);
 
+  // current editing cell
+  const [editingCell, setEditingCell] = useState<{
+    productId: string;
+    field: "price" | "stock";
+  } | null>(null);
+
+  // edited values only
+  const [editedValues, setEditedValues] = useState<
+    Record<string, EditableFields>
+  >({});
+
+  // =========================
+  // FETCH PRODUCTS
+  // =========================
   const getProducts = async () => {
     try {
       setLoading(true);
 
-      const res = await axios.get(`${API_URL}/products`);
+      const res = await axios.get(`${API_URL}/products`, {
+        params: {
+          page: 1,
+          limit: 100,
+        },
+      });
 
-  
-      setProducts(res.data?.data || res.data || []);
-    } catch (err) {
-      console.log(err);
+      const productsData =
+        res.data?.data?.products ||
+        res.data?.data?.items ||
+        res.data?.data ||
+        res.data?.products ||
+        res.data ||
+        [];
+
+      setProducts(Array.isArray(productsData) ? productsData : []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+
+      setProducts([]);
     } finally {
       setLoading(false);
     }
   };
-  const openEditModal = (product: Product) => {
-    setSelectedProduct(product);
-    setShowEditModal(true);
-  };
 
-  const openDeleteModal = (product: Product) => {
-    setSelectedProduct(product);
-    setShowDeleteModal(true);
-  };
+  // =========================
+  // FETCH ON LOAD
+  // =========================
   useEffect(() => {
     const fetchProducts = async () => {
       await getProducts();
@@ -53,6 +81,123 @@ export default function QuantityPage() {
     fetchProducts();
   }, []);
 
+  // =========================
+  // START EDITING
+  // =========================
+  const startEditing = (productId: string, field: "price" | "stock") => {
+    setEditingCell({
+      productId,
+      field,
+    });
+  };
+
+  // =========================
+  // HANDLE INPUT CHANGE
+  // =========================
+  const handleChange = (
+    product: Product,
+    field: "price" | "stock",
+    value: string,
+  ) => {
+    setEditedValues((prev) => ({
+      ...prev,
+
+      [product._id]: {
+        price:
+          field === "price"
+            ? Number(value)
+            : (prev[product._id]?.price ?? product.price),
+
+        stock:
+          field === "stock"
+            ? Number(value)
+            : (prev[product._id]?.stock ?? product.stock),
+      },
+    }));
+  };
+
+  // =========================
+  // SAVE ALL CHANGES
+  // =========================
+  const saveAllChanges = async () => {
+    try {
+      setSaving(true);
+
+      const token = localStorage.getItem("admin_token");
+
+      const changedProducts = Object.entries(editedValues);
+
+      if (changedProducts.length === 0) {
+        alert("تغییری انجام نشده");
+
+        return;
+      }
+
+      // SAVE ALL USING PROMISE.ALL
+      await Promise.all(
+        changedProducts.map(([productId, values]) =>
+          axios.put(
+            `${API_URL}/products/${productId}`,
+            {
+              price: values.price,
+              stock: values.stock,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          ),
+        ),
+      );
+
+      // UPDATE UI AFTER SUCCESS
+      setProducts((prev) =>
+        prev.map((product) => {
+          const edited = editedValues[product._id];
+
+          if (!edited) return product;
+
+          return {
+            ...product,
+            price: edited.price,
+            stock: edited.stock,
+          };
+        }),
+      );
+
+      // RESET
+      setEditedValues({});
+      setEditingCell(null);
+
+      alert("همه تغییرات ذخیره شدند");
+    } catch (error) {
+      console.error("Save failed:", error);
+
+      alert("خطا در ذخیره تغییرات");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // =========================
+  // IMAGE URL FIX
+  // =========================
+  const getImageSrc = (image: string) => {
+    if (!image) return "";
+
+    // already full URL
+    if (image.startsWith("http")) {
+      return image;
+    }
+
+    // relative path
+    return `${IMAGE_BASE_URL}${image}`;
+  };
+
+  // =========================
+  // LOADING
+  // =========================
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20 text-slate-500">
@@ -65,10 +210,16 @@ export default function QuantityPage() {
     <div className="space-y-6" dir="rtl">
       {/* HEADER */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-black text-slate-800">لیست محصولات</h1>
+        <h1 className="text-2xl font-black text-slate-800">
+          مدیریت قیمت و موجودی
+        </h1>
 
-        <button className="rounded-xl bg-slate-800 px-4 py-2 text-white">
-          + افزودن محصول
+        <button
+          onClick={saveAllChanges}
+          disabled={saving}
+          className="rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 px-5 py-2 font-medium text-white shadow-lg transition hover:scale-[1.02] disabled:opacity-50"
+        >
+          {saving ? "در حال ذخیره..." : "ذخیره همه"}
         </button>
       </div>
 
@@ -86,43 +237,95 @@ export default function QuantityPage() {
           </thead>
 
           <tbody>
-            {products.map((p, index) => (
-              <tr key={p._id} className="border-b hover:bg-slate-50 transition">
-                {/* index */}
-                <td className="p-3 text-center">{index + 1}</td>
+            {products.map((p, index) => {
+              const edited = editedValues[p._id];
 
-                {/* image */}
-                <td className="p-3">
-                  <div className="h-12 w-12 overflow-hidden rounded-lg bg-slate-100">
-                    {p.images.length ? (
-                      <Image
-                        src={`${p.images[0]}`}
-                        alt={p.name}
-                        width={50}
-                        height={50}
-                        className="h-full w-full object-cover"
+              const currentPrice = edited?.price ?? p.price;
+
+              const currentStock = edited?.stock ?? p.stock;
+
+              return (
+                <tr
+                  key={p._id}
+                  className="border-b transition hover:bg-slate-50"
+                >
+                  {/* INDEX */}
+                  <td className="p-3 text-center">{index + 1}</td>
+
+                  {/* IMAGE */}
+                  <td className="p-3">
+                    <div className="h-12 w-12 overflow-hidden rounded-lg bg-slate-100">
+                      {p.images.length ? (
+                        <Image
+                          src={`${p.images[0]}`}
+                          alt={p.name}
+                          width={50}
+                          height={50}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-xs text-slate-400">
+                          no img
+                        </div>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* NAME */}
+                  <td className="p-3 font-semibold text-slate-700">{p.name}</td>
+
+                  {/* PRICE */}
+                  <td
+                    onDoubleClick={() => startEditing(p._id, "price")}
+                    className="cursor-pointer p-3"
+                  >
+                    {editingCell?.productId === p._id &&
+                    editingCell?.field === "price" ? (
+                      <input
+                        type="number"
+                        autoFocus
+                        value={currentPrice}
+                        onChange={(e) =>
+                          handleChange(p, "price", e.target.value)
+                        }
+                        className="w-[140px] rounded-lg border p-2 outline-none focus:border-orange-400"
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center text-xs text-slate-400">
-                        no img
-                      </div>
+                      <span className="rounded-lg bg-orange-50 px-3 py-2 text-orange-700 hover:bg-orange-100">
+                        {currentPrice.toLocaleString()} تومان
+                      </span>
                     )}
-                  </div>
-                </td>
+                  </td>
 
-                {/* title */}
-                <td className="p-3 font-semibold text-slate-700">{p.name}</td>
-
-                {/* price */}
-                <td className="p-3">{p.price?.toLocaleString()} تومان</td>
-
-                {/* stock */}
-                <td className="p-3">{p.stock}</td>
-              </tr>
-            ))}
+                  {/* STOCK */}
+                  <td
+                    onDoubleClick={() => startEditing(p._id, "stock")}
+                    className="cursor-pointer p-3"
+                  >
+                    {editingCell?.productId === p._id &&
+                    editingCell?.field === "stock" ? (
+                      <input
+                        type="number"
+                        autoFocus
+                        value={currentStock}
+                        onChange={(e) =>
+                          handleChange(p, "stock", e.target.value)
+                        }
+                        className="w-[100px] rounded-lg border p-2 outline-none focus:border-orange-400"
+                      />
+                    ) : (
+                      <span className="rounded-lg bg-slate-100 px-3 py-2">
+                        {currentStock}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 
+        {/* EMPTY */}
         {products.length === 0 && (
           <div className="py-10 text-center text-slate-500">
             محصولی یافت نشد

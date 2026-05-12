@@ -6,8 +6,6 @@ import { ArrowLeft, Flame, ShoppingBag } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 
-
-
 type Product = {
   id: number;
   title: string;
@@ -129,7 +127,6 @@ function ProductCard({ product }: { product: Product }) {
   );
 }
 
-
 export function MostSaled() {
   return (
     <section className="relative overflow-hidden py-16 md:py-24">
@@ -152,11 +149,6 @@ export function MostSaled() {
             <h2 className="text-4xl font-black text-white md:text-5xl">
               پرفروش‌ترین محصولات
             </h2>
-
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-400">
-              بهترین و محبوب‌ترین محصولات ورزشی فروشگاه اسپرتکس را
-              مشاهده کنید.
-            </p>
           </div>
 
           <Link
@@ -164,7 +156,6 @@ export function MostSaled() {
             className="group inline-flex items-center gap-2 self-start rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-white backdrop-blur-xl transition hover:border-orange-500 hover:bg-orange-500"
           >
             مشاهده همه محصولات
-
             <ArrowLeft
               size={18}
               className="transition group-hover:-translate-x-1"
@@ -173,7 +164,7 @@ export function MostSaled() {
         </div>
 
         {/* Swiper */}
-         <Swiper
+        <Swiper
           modules={[Autoplay, Navigation]}
           navigation
           autoplay={{

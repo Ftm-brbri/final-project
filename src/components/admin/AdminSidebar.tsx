@@ -66,7 +66,7 @@ export default function AdminSidebar() {
 
           <div>
             <h2 className="text-2xl font-extrabold">اسپرتکس</h2>
-            <p className="mt-1 text-sm text-white/80">پنل مدیریت حرفه‌ای</p>
+            <p className="mt-1 text-sm text-white/80">پنل مدیریت</p>
           </div>
         </div>
       </div>

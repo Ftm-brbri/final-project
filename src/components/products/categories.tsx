@@ -71,7 +71,7 @@ function CategoryCard({
         src={item.image}
         alt={item.title}
         fill
-        className="object-contain transition duration-700 group-hover:scale-110"
+        className="object-contain transition duration-700 group-hover:scale-110 "
       />
 
       {/* Overlay */}
@@ -83,9 +83,7 @@ function CategoryCard({
       {/* Content */}
       <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
         <div className="translate-y-4 transition duration-500 group-hover:translate-y-0">
-          {/* <div className="mb-3 inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-white backdrop-blur-xl">
-            دسته‌بندی ویژه
-          </div> */}
+         
 
           <h3 className="text-2xl font-black text-white md:text-3xl">
             {item.title}
@@ -138,36 +136,28 @@ function Category() {
             <h2 className="text-4xl font-black text-slate-900 md:text-5xl">
               خرید بر اساس دسته‌بندی
             </h2>
-
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-500">
-              بهترین محصولات ورزشی را بر اساس دسته‌بندی مورد نظر خود
-              انتخاب کنید.
-            </p>
           </div>
 
           <button
             onClick={() => router.push("/product")}
-            className="group flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-4 text-white transition hover:bg-orange-500"
+            className="group flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-4 text-white transition hover:bg-orange-500 "
           >
             مشاهده همه محصولات
-
             <ArrowLeft
               size={18}
-              className="transition group-hover:-translate-x-1"
+              className="transition group-hover:-translate-x-1 "
             />
           </button>
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 ">
           {/* Large Card */}
           {featuredCategory && (
             <div className="lg:col-span-5">
               <CategoryCard
                 item={featuredCategory}
-                onClick={() =>
-                  handleNavigate(featuredCategory.category)
-                }
+                onClick={() => handleNavigate(featuredCategory.category)}
               />
             </div>
           )}

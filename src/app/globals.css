@@ -6,3 +6,12 @@
 @theme {
   --color-primary: #efc030;
 }
+@font-face {
+  font-family: "vazir";
+  src: url("/fonts/vazir-font-v16.1.0/Farsi-Digits-Without-Latin/Vazir-Bold-FD-WOL.woff2")
+    format("woff2");
+  font-weight: 900;
+}
+* {
+  font-family: "vazir";
+}

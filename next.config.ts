@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
         hostname: "storage.c2.liara.space",
       },
     ],
+    domains: ["maktab-shop.runflare.run"],
   },
 };
 

@@ -49,17 +49,17 @@ const COLORS = ["#f97316", "#0f172a", "#22c55e", "#38bdf8"];
 const stats = [
   {
     title: "کاربران",
-    value: "1,248",
+    value: "۷,۰۱۴",
     icon: Users,
     color: "from-blue-500 to-cyan-400",
-    growth: "+12%",
+    growth: "+۱۱%",
   },
   {
     title: "سفارشات",
-    value: "328",
+    value: "۱۱",
     icon: ShoppingBag,
     color: "from-emerald-500 to-green-400",
-    growth: "+18%",
+    growth: "+۱۷%",
   },
   {
     title: "درآمد کل",
@@ -67,14 +67,14 @@ const stats = [
     suffix: "ریال",
     icon: Banknote,
     color: "from-orange-500 to-amber-400",
-    growth: "+24%",
+    growth: "+۱۴%",
   },
   {
     title: "محصولات",
-    value: "542",
+    value: "۹۱",
     icon: Package,
     color: "from-violet-500 to-fuchsia-400",
-    growth: "+7%",
+    growth: "+۷%",
   },
 ];
 
@@ -138,7 +138,7 @@ export default function DashboardPage() {
           <div>
             <p className="text-sm text-slate-500">رشد فروش این ماه</p>
 
-            <p className="font-black text-orange-500">+28.4%</p>
+            <p className="font-black text-orange-500">+۷.۹۱%</p>
           </div>
         </div>
       </div>
@@ -209,7 +209,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600">
-              7 روز اخیر
+              ۷ روز اخیر
             </div>
           </div>
 
