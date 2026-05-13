@@ -27,14 +27,14 @@ const categories: CategoryItem[] = [
     title: "کفش مردانه",
     subtitle: "مناسب دویدن و باشگاه",
     image: "/image/367-2.jpg",
-    category: "shoes",
+    category: "men",
   },
   {
     id: 3,
     title: "کفش زنانه",
     subtitle: "استایل راحت و مدرن",
     image: "/image/367-1.jpg",
-    category: "daily-shoes",
+    category: "women",
   },
   {
     id: 4,
@@ -47,8 +47,8 @@ const categories: CategoryItem[] = [
     id: 5,
     title: "لباس ورزشی",
     subtitle: "پوشاک اسپرت حرفه‌ای",
-    image: "/image/357-7.jpg",
-    category: "clothes",
+    image: "/image/367-5.jpg",
+    category: "set&&mne&&women",
   },
 ];
 
@@ -83,8 +83,6 @@ function CategoryCard({
       {/* Content */}
       <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
         <div className="translate-y-4 transition duration-500 group-hover:translate-y-0">
-         
-
           <h3 className="text-2xl font-black text-white md:text-3xl">
             {item.title}
           </h3>

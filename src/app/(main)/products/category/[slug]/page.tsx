@@ -1,9 +1,8 @@
-// src/app/(main)/products/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import ProductsGrid from "@/src/components/products/products-grid";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
@@ -11,16 +10,21 @@ const API_URL = "https://maktab-shop.runflare.run/api";
 type Product = {
   _id: string;
   name: string;
-  title?: string;
   price: number;
   stock: number;
   category: string;
   images: string[];
 };
+// const categoryTitles: Record<string, string> = {
+//   men: "کفش مردانه",
+//   women: "کفش زنانه",
+//   equipment: "تجهیزات ورزشی",
+//   sets: "ست‌های ورزشی",
+// };
 
-export default function ProductsPage() {
-  const searchParams = useSearchParams();
-  const category = searchParams.get("category");
+export default function CategoryPage() {
+  const params = useParams();
+  const slug = params.slug; // 'men', 'women', etc.
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +38,7 @@ export default function ProductsPage() {
           params: {
             page: 1,
             limit: 100,
+            category: slug, // filter by category
           },
         });
 
@@ -45,15 +50,7 @@ export default function ProductsPage() {
           res.data ||
           [];
 
-        // If category exists, filter products by category
-        const filteredProducts = category
-          ? allProducts.filter(
-              (product) =>
-                product.category?.toLowerCase() === category.toLowerCase(),
-            )
-          : allProducts;
-
-        setProducts(filteredProducts);
+        setProducts(allProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
         setProducts([]);
@@ -63,7 +60,7 @@ export default function ProductsPage() {
     };
 
     fetchProducts();
-  }, [category]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -79,14 +76,14 @@ export default function ProductsPage() {
         {/* PAGE TITLE */}
         <div className="mb-8">
           <h1 className="text-3xl font-black text-slate-900">
-            {category ? `محصولات دسته‌بندی ${category}` : "همه محصولات"}
+            {slug ? `محصولات دسته‌بندی ${slug}` : "همه محصولات"}
           </h1>
           <p className="mt-2 text-slate-500">
             {products.length.toLocaleString("fa-IR")} محصول یافت شد
           </p>
         </div>
 
-        {/* EMPTY STATE */}
+        {/* PRODUCTS */}
         {products.length === 0 ? (
           <div className="rounded-3xl bg-white p-16 text-center shadow-sm">
             <p className="text-lg text-slate-500">
@@ -94,7 +91,6 @@ export default function ProductsPage() {
             </p>
           </div>
         ) : (
-          /* REUSABLE PRODUCTS GRID */
           <ProductsGrid products={products} />
         )}
       </div>
