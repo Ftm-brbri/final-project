@@ -23,9 +23,9 @@ export default function OrdersPage() {
 
   const [loading, setLoading] = useState(true);
 
-  // =========================
+  
   // GET ORDERS
-  // =========================
+  
   const getOrders = async () => {
     try {
       setLoading(true);
@@ -64,9 +64,9 @@ export default function OrdersPage() {
     }
   };
 
-  // =========================
+  
   // FETCH ON LOAD
-  // =========================
+  
   useEffect(() => {
     const fetchOrders = async () => {
       await getOrders();
@@ -75,9 +75,9 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  // =========================
+  
   // LOADING
-  // =========================
+  
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20 text-slate-500">
