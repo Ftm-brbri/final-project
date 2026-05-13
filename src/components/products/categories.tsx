@@ -24,14 +24,14 @@ const categories: CategoryItem[] = [
   },
   {
     id: 2,
-    title: "کفش ورزشی",
+    title: "کفش مردانه",
     subtitle: "مناسب دویدن و باشگاه",
     image: "/image/357-2.jpg",
     category: "shoes",
   },
   {
     id: 3,
-    title: "کفش روزانه",
+    title: "کفش زنانه",
     subtitle: "استایل راحت و مدرن",
     image: "/image/357-1.jpg",
     category: "daily-shoes",
