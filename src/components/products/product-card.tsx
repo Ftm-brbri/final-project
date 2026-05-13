@@ -41,18 +41,13 @@ export default function ProductCard({ product }: ProductCardProps) {
     >
       {/* IMAGE */}
       <Link href={`/products/${product._id}`}>
-        <div className="relative aspect-[4/5] overflow-hidden bg-white">
+        <div className="relative aspect-4/5 overflow-hidden bg-white">
           <Image
             src={imageSrc}
             alt={product.name}
             fill
             className="object-cover transition duration-500 group-hover:scale-105"
           />
-
-          {/* BADGE */}
-          <span className="absolute right-4 top-4 rounded-full bg-orange-500 px-4 py-1 text-xs font-bold text-white shadow">
-            پرفروش
-          </span>
         </div>
       </Link>
 

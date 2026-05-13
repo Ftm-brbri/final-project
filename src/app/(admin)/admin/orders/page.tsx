@@ -10,13 +10,11 @@ type Order = {
   totalPrice: number;
 
   shippingAddress?: {
-    fullName?: string;
-    phoneNumber?: string;
-    city?: string;
+    name?: string;
+    phone?: string;
+    address?: string;
   };
-
-  deliveryStatus: string;
-
+  status: string;
   createdAt: string;
 };
 
@@ -124,11 +122,10 @@ export default function OrdersPage() {
 
                 {/* CUSTOMER */}
                 <td className="p-3 font-semibold text-slate-700">
-                  {order.shippingAddress?.fullName || "نامشخص"}
+                  {order.shippingAddress?.name || "نامشخص"}
                 </td>
 
-                {/* CITY */}
-                <td className="p-3">{order.shippingAddress?.city || "-"}</td>
+                <td className="p-3">{order.shippingAddress?.address || "-"}</td>
 
                 {/* PRICE */}
                 <td className="p-3">
@@ -137,13 +134,13 @@ export default function OrdersPage() {
 
                 {/* STATUS */}
                 <td className="p-3">
-                  {order.deliveryStatus === "pending"
+                  {order.status === "pending"
                     ? "در انتظار"
-                    : order.deliveryStatus === "shipped"
+                    : order.status === "shipped"
                       ? "ارسال شده"
-                      : order.deliveryStatus === "delivered"
+                      : order.status === "delivered"
                         ? "تحویل شده"
-                        : order.deliveryStatus}
+                        : order.status}
                 </td>
 
                 {/* DATE */}
