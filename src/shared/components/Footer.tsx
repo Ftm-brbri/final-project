@@ -46,7 +46,7 @@ export default function Footer() {
   return (
     <footer
       dir="rtl"
-      className="relative mt-24 overflow-hidden bg-slate-950 text-white"
+      className="relative overflow-hidden bg-slate-950 text-white"
     >
       {/* Background */}
       <div className="absolute left-0 top-0 h-[300px] w-[300px] rounded-full bg-orange-500/10 blur-[120px]" />
