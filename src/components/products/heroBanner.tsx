@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function HeroBanner() {
-  const [offset, setOffset] = useState(0);
+  const [offset, setOffset] = useState(200);
 
   useEffect(() => {
     const handleScroll = () => {
-      setOffset(window.scrollY);
+      console.log();
+      setOffset(window.scrollY - window.screen.height - 200);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -17,7 +18,7 @@ export default function HeroBanner() {
   }, []);
 
   return (
-    <section className="relative h-[420px] w-full overflow-hidden">
+    <section className="relative h-105 w-full overflow-hidden">
       {/* IMAGE */}
       <div
         className="absolute inset-0 will-change-transform"
@@ -26,6 +27,9 @@ export default function HeroBanner() {
         }}
       >
         <Image
+          style={{
+            top: "-120px",
+          }}
           src="/image/367-3.jpg"
           alt="sport shoes image"
           fill
@@ -39,14 +43,8 @@ export default function HeroBanner() {
 
       {/* CONTENT */}
       <div className="relative z-10 flex h-full flex-col items-start justify-center px-6 md:px-16">
-        <h1 className="text-4xl font-black leading-tight text-white md:text-6xl">
-          با استوک حرفه‌ای
-        </h1>
-
-        <p className="mt-4 text-lg text-white/80">بازی رو مال خودت کن</p>
-
         <button className="mt-8 rounded-2xl bg-white px-8 py-4 font-bold text-black transition hover:bg-orange-500 hover:text-white">
-          همه مدل‌ها
+          قدم اول رو بردار
         </button>
       </div>
     </section>
