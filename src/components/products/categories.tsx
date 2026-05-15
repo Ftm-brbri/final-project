@@ -19,7 +19,7 @@ const categories: CategoryItem[] = [
     title: "ست‌های ورزشی",
     subtitle: "جدیدترین ست‌های اسپرت",
     image: "/image/367-4.jpg",
-    category: "sets",
+    category: "set",
     large: true,
   },
   {
@@ -108,7 +108,7 @@ function Category() {
   const router = useRouter();
 
   const handleNavigate = (category: string) => {
-    router.push(`/product?category=${category}`);
+    router.push(`/products?category=${category}`);
   };
 
   const featuredCategory = categories.find((item) => item.large);
@@ -137,7 +137,7 @@ function Category() {
           </div>
 
           <button
-            onClick={() => router.push("/product")}
+            onClick={() => router.push("/products")}
             className="group flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-4 text-white transition hover:bg-orange-500 "
           >
             مشاهده همه محصولات

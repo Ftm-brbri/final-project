@@ -43,7 +43,7 @@ export default function HeroBanner() {
 
       {/* CONTENT */}
       <div className="relative z-10 flex h-full flex-col items-start justify-center px-6 md:px-16">
-        <button className="mt-8 rounded-2xl bg-white px-8 py-4 font-bold text-black transition hover:bg-orange-500 hover:text-white">
+        <button className="mt-8 rounded-2xl bg-white px-8 py-4 font-extrabold text-2xl text-black transition hover:bg-orange-500 hover:text-white">
           قدم اول رو بردار
         </button>
       </div>

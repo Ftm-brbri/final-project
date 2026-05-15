@@ -81,7 +81,7 @@ export default function SingleProductPage({ productId }: Props) {
   return (
     <section
       dir="rtl"
-      className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-10"
+      className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-10 mt-10"
     >
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         {/* Breadcrumb */}
@@ -119,9 +119,12 @@ export default function SingleProductPage({ productId }: Props) {
             </div>
 
             {/* Main Image */}
-            <div className="relative flex-1 overflow-hidden rounded-[32px] bg-white shadow-xl">
+            <div className="relative flex-1 overflow-hidden rounded-[32px] bg-white shadow-xl h-fit">
               <div className="relative aspect-square w-full">
                 <Image
+                  style={{
+                    objectPosition: "top",
+                  }}
                   src={selectedImage || images[0]}
                   alt={product.name}
                   fill
