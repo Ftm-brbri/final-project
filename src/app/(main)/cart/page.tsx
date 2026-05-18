@@ -1,3 +1,9 @@
+import Cart from "@/src/components/cart/default-cart";
+
 export default function Page() {
-  return <div>cart</div>;
+  return (
+    <div>
+      <Cart />
+    </div>
+  );
 }

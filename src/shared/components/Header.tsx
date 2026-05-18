@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const navItems = [
@@ -62,7 +62,7 @@ export default function Header() {
           >
             <Menu size={22} />
           </button>
-{/* Logo */}
+          {/* Logo */}
           <Link href="/" className="shrink-0">
             <Image
               src="/image/og-sportex.png"
@@ -125,10 +125,13 @@ export default function Header() {
             </div>
           </div>
         </div>
-{/* Left */}
+        {/* Left */}
         <div className="flex items-center gap-3">
-          <button className="hidden h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur-xl transition hover:bg-orange-500 lg:flex">
-            <ShoppingBag size={20} />
+          <button
+            onClick={() => router.push("/cart")}
+            className="hidden h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur-xl transition hover:bg-orange-500 lg:flex"
+          >
+            <ShoppingCart size={20} />
           </button>
 
           <button
