@@ -9,10 +9,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import dynamic from "next/dynamic";
-import "react-quill/dist/quill.snow.css";
-
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
+// ایمپورت‌های مربوط به Tiptap
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
 
@@ -28,6 +28,77 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
+
+const TiptapEditor = ({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+}) => {
+  const editor = useEditor({
+    extensions: [StarterKit, Underline],
+    content: value,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
+    editorProps: {
+      attributes: {
+        class:
+          "min-h-[150px] w-full rounded-b-xl border border-t-0 p-3 focus:outline-none bg-white",
+      },
+    },
+  });
+
+  if (!editor) return null;
+
+  return (
+    <div className="flex flex-col">
+      {/* TOOLBAR */}
+      <div className="flex gap-2 rounded-t-xl border border-b-gray-200 bg-gray-50 p-2">
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={`px-3 py-1 rounded font-bold ${
+            editor.isActive("bold") ? "bg-gray-300" : "hover:bg-gray-200"
+          }`}
+        >
+          B
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={`px-3 py-1 rounded italic ${
+            editor.isActive("italic") ? "bg-gray-300" : "hover:bg-gray-200"
+          }`}
+        >
+          I
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          className={`px-3 py-1 rounded underline ${
+            editor.isActive("underline") ? "bg-gray-300" : "hover:bg-gray-200"
+          }`}
+        >
+          U
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleStrike().run()}
+          className={`px-3 py-1 rounded line-through ${
+            editor.isActive("strike") ? "bg-gray-300" : "hover:bg-gray-200"
+          }`}
+        >
+          S
+        </button>
+      </div>
+
+      {/* EDITOR CONTENT */}
+      <EditorContent editor={editor} />
+    </div>
+  );
+};
 
 /* 
    PAGE
@@ -65,11 +136,8 @@ export default function CreateProductPage() {
    */
   const handleImages = (files: FileList | null) => {
     if (!files) return;
-
     setImages(files);
-
     const previews = Array.from(files).map((file) => URL.createObjectURL(file));
-
     setPreviewImages(previews);
   };
 
@@ -79,9 +147,7 @@ export default function CreateProductPage() {
   const onSubmit = async (data: FormData) => {
     try {
       setLoading(true);
-
       const token = localStorage.getItem("admin_token");
-
       const formData = new FormData();
 
       formData.append("name", data.name);
@@ -158,13 +224,13 @@ export default function CreateProductPage() {
           className="w-full rounded-xl border p-3"
         />
 
-        {/* DESCRIPTION (React Quill) */}
+        {/* DESCRIPTION (Tiptap) */}
         <div>
-          <ReactQuill
-            theme="snow"
+          <TiptapEditor
             value={description}
-            onChange={(val) => setValue("description", val)}
-            className="bg-white"
+            onChange={(val) =>
+              setValue("description", val, { shouldValidate: true })
+            }
           />
           {errors.description && (
             <p className="text-red-500 text-sm">{errors.description.message}</p>
