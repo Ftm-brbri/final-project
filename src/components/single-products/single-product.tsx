@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { Heart, Minus, Plus, Share2, ShoppingBag } from "lucide-react";
+import toast from "react-hot-toast";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
 const BASE_URL = "https://maktab-shop.runflare.run";
@@ -119,17 +120,15 @@ export default function SingleProductPage({ productId }: Props) {
             </div>
 
             {/* Main Image */}
-            <div className="relative flex-1 overflow-hidden rounded-[32px] bg-white shadow-xl h-fit">
+            <div className="relative flex-1 overflow-hidden rounded-[32px] bg-white shadow-xl">
               <div className="relative aspect-square w-full">
                 <Image
-                  style={{
-                    objectPosition: "top",
-                  }}
-                  src={selectedImage || images[0]}
+                  src={selectedImage || images[0] || "/image/placeholder.png"}
                   alt={product.name}
                   fill
                   priority
-                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-contain p-6 transition duration-500 hover:scale-105"
                 />
               </div>
             </div>
@@ -212,7 +211,52 @@ export default function SingleProductPage({ productId }: Props) {
 
             {/* Actions */}
             <div className="mt-12 flex flex-col gap-4 sm:flex-row">
-              <button className="group flex h-16 flex-1 items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-8 text-lg font-bold text-white shadow-xl">
+              <button
+                onClick={() => {
+                  // Get existing cart from localStorage
+                  const existingCart = JSON.parse(
+                    localStorage.getItem("cart") || "[]",
+                  );
+
+                  // Check if product already exists
+                  const existingProductIndex = existingCart.findIndex(
+                    (item: Product & { quantity: number }) =>
+                      item._id === product._id,
+                  );
+
+                  if (existingProductIndex !== -1) {
+                    // Increase quantity if product already exists
+                    existingCart[existingProductIndex].quantity += quantity;
+                  } else {
+                    // Add new product to cart
+                    existingCart.push({
+                      ...product,
+                      quantity,
+                    });
+                  }
+
+                  // Save updated cart
+                  localStorage.setItem("cart", JSON.stringify(existingCart));
+
+                  // Show success toast
+                  toast.success(
+                    <div className="flex flex-col gap-2">
+                      <span>محصول با موفقیت به سبد خرید اضافه شد</span>
+
+                      <a
+                        href="/cart"
+                        className="text-sm font-bold text-orange-500 hover:underline"
+                      >
+                        برو به سبد خرید
+                      </a>
+                    </div>,
+                    {
+                      duration: 4000,
+                    },
+                  );
+                }}
+                className="group flex h-16 flex-1 items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-8 text-lg font-bold text-white shadow-xl cursor-pointer"
+              >
                 <ShoppingBag size={22} />
                 افزودن به سبد خرید
               </button>
