@@ -208,11 +208,11 @@ export default function Page() {
         </div>
       </div>
 
-      {/* Login Card */}
+   
       <div className="relative flex w-full items-center justify-center p-6 lg:w-[600px]">
         <div className="w-full max-w-md">
           <div className="rounded-[32px] border border-white/10 bg-white/10 p-8 shadow-2xl backdrop-blur-2xl">
-            {/* Header */}
+           
             <div className="mb-10 text-center">
               <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-orange-500 to-amber-400 shadow-2xl shadow-orange-500/30">
                 <ShieldCheck size={38} className="text-white" />
@@ -225,9 +225,7 @@ export default function Page() {
               </p>
             </div>
 
-            {/* Form */}
             <form onSubmit={onSubmit} className="space-y-5">
-              {/* Email */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-300">
                   ایمیل
@@ -247,7 +245,6 @@ export default function Page() {
                 </div>
               </div>
 
-              {/* Password */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-300">
                   کلمه عبور
@@ -275,14 +272,12 @@ export default function Page() {
                 </div>
               </div>
 
-              {/* Error */}
               {error && (
                 <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
                   {error}
                 </div>
               )}
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -296,7 +291,7 @@ export default function Page() {
               </button>
             </form>
 
-            {/* Footer */}
+            
             <div className="mt-8 text-center text-sm text-slate-500">
               Sportex Professional Admin Panel
             </div>

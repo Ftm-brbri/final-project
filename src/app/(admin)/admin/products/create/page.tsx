@@ -4,27 +4,22 @@ import { useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-// ایمپورت‌های مربوط به Tiptap
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
 
-/* 
-   VALIDATION SCHEMA
- */
 const schema = z.object({
   name: z.string().min(2, "نام محصول الزامی است"),
   price: z.string().min(1, "قیمت الزامی است"),
   stock: z.string().min(1, "موجودی الزامی است"),
   category: z.string().min(2, "دسته‌بندی الزامی است"),
   description: z.string().min(10, "توضیحات باید کامل باشد"),
+  image: z.string().min(10, "افزودن حداقل یک عکس الزامی است"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -54,7 +49,6 @@ const TiptapEditor = ({
 
   return (
     <div className="flex flex-col">
-      {/* TOOLBAR */}
       <div className="flex gap-2 rounded-t-xl border border-b-gray-200 bg-gray-50 p-2">
         <button
           type="button"
@@ -94,24 +88,17 @@ const TiptapEditor = ({
         </button>
       </div>
 
-      {/* EDITOR CONTENT */}
       <EditorContent editor={editor} />
     </div>
   );
 };
 
-/* 
-   PAGE
- */
 export default function CreateProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<FileList | null>(null);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
 
-  /* 
-     REACT HOOK FORM
-   */
   const {
     register,
     handleSubmit,
@@ -126,24 +113,23 @@ export default function CreateProductPage() {
       stock: "",
       category: "",
       description: "",
+      image: "",
     },
   });
 
   const description = watch("description");
+  const currentCategory = watch("category");
 
-  /* 
-     IMAGE HANDLER
-   */
   const handleImages = (files: FileList | null) => {
     if (!files) return;
     setImages(files);
+    if (files.length > 0) {
+      setValue("image", files[0].name, { shouldValidate: true });
+    }
     const previews = Array.from(files).map((file) => URL.createObjectURL(file));
     setPreviewImages(previews);
   };
 
-  /* 
-     SUBMIT
-   */
   const onSubmit = async (data: FormData) => {
     try {
       setLoading(true);
@@ -186,7 +172,6 @@ export default function CreateProductPage() {
         onSubmit={handleSubmit(onSubmit)}
         className="rounded-2xl border bg-white p-6 space-y-5"
       >
-        {/* NAME */}
         <div>
           <input
             placeholder="نام محصول"
@@ -194,37 +179,67 @@ export default function CreateProductPage() {
             className="w-full rounded-xl border p-3"
           />
           {errors.name && (
-            <p className="text-red-500 text-sm">{errors.name.message}</p>
+            <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
           )}
         </div>
 
-        {/* PRICE */}
         <div>
           <input
+            type="number"
             placeholder="قیمت"
             {...register("price")}
             className="w-full rounded-xl border p-3"
           />
           {errors.price && (
-            <p className="text-red-500 text-sm">{errors.price.message}</p>
+            <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>
           )}
         </div>
 
-        {/* STOCK */}
-        <input
-          placeholder="موجودی"
-          {...register("stock")}
-          className="w-full rounded-xl border p-3"
-        />
+        <div>
+          <input
+            type="number"
+            placeholder="موجودی"
+            {...register("stock")}
+            className="w-full rounded-xl border p-3"
+          />
+          {errors.stock && (
+            <p className="text-red-500 text-sm mt-1">{errors.stock.message}</p>
+          )}
+        </div>
 
-        {/* CATEGORY */}
-        <input
-          placeholder="دسته‌بندی"
-          {...register("category")}
-          className="w-full rounded-xl border p-3"
-        />
+        <div>
+          <select
+            {...register("category")}
+            className={`w-full rounded-xl border p-3 bg-white ${
+              !currentCategory ? "text-gray-500" : "text-black"
+            }`}
+          >
+            <option value="" className="text-gray-500">
+              انتخاب دسته‌بندی...
+            </option>
+            <option value="women" className="text-black">
+              زنان (women)
+            </option>
+            <option value="men" className="text-black">
+              مردان (men)
+            </option>
+            <option value="equipment" className="text-black">
+              تجهیزات (equipment)
+            </option>
+            <option value="set" className="text-black">
+              ست (set)
+            </option>
+            <option value="stoke" className="text-black">
+              استوک (stoke)
+            </option>
+          </select>
+          {errors.category && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.category.message}
+            </p>
+          )}
+        </div>
 
-        {/* DESCRIPTION (Tiptap) */}
         <div>
           <TiptapEditor
             value={description}
@@ -233,35 +248,62 @@ export default function CreateProductPage() {
             }
           />
           {errors.description && (
-            <p className="text-red-500 text-sm">{errors.description.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.description.message}
+            </p>
           )}
         </div>
 
-        {/* IMAGES */}
-        <input
-          type="file"
-          multiple
-          onChange={(e) => handleImages(e.target.files)}
-        />
-
-        {/* PREVIEW */}
-        <div className="flex gap-3 flex-wrap">
-          {previewImages.map((img, i) => (
-            <Image
-              key={i}
-              src={img}
-              alt=""
-              width={80}
-              height={80}
-              className="rounded-xl object-cover"
+        <div>
+          <label className="flex w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 py-8 hover:bg-gray-100 transition-colors">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-10 w-10 text-gray-400 mb-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
+            </svg>
+            <span className="text-sm text-gray-500 font-medium">
+              برای انتخاب تصاویر کلیک کنید
+            </span>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => handleImages(e.target.files)}
             />
-          ))}
+          </label>
+          {errors.image && (
+            <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>
+          )}
         </div>
 
-        {/* BUTTON */}
+        {previewImages.length > 0 && (
+          <div className="flex gap-3 flex-wrap p-2 border rounded-xl bg-gray-50">
+            {previewImages.map((img, i) => (
+              <Image
+                key={i}
+                src={img}
+                alt="preview"
+                width={80}
+                height={80}
+                className="rounded-lg object-cover shadow-sm border border-gray-200"
+              />
+            ))}
+          </div>
+        )}
+
         <button
           disabled={loading}
-          className="w-full rounded-xl bg-black text-white py-3"
+          className="w-full rounded-xl bg-black text-white py-3 bg-gradient-to-br from-orange-500 to-amber-400 hover:from-orange-600 hover:to-amber-500 transition-all disabled:opacity-70 cursor-pointer"
         >
           {loading ? "در حال ساخت..." : "ایجاد محصول"}
         </button>

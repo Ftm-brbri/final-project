@@ -27,20 +27,17 @@ export default function QuantityPage() {
 
   const [saving, setSaving] = useState(false);
 
-  // current editing cell
+  // current
   const [editingCell, setEditingCell] = useState<{
     productId: string;
     field: "price" | "stock";
   } | null>(null);
 
-  // edited values only
+  // edited values
   const [editedValues, setEditedValues] = useState<
     Record<string, EditableFields>
   >({});
 
-  // =========================
-  // FETCH PRODUCTS
-  // =========================
   const getProducts = async () => {
     try {
       setLoading(true);
@@ -70,9 +67,8 @@ export default function QuantityPage() {
     }
   };
 
-  // =========================
   // FETCH ON LOAD
-  // =========================
+
   useEffect(() => {
     const fetchProducts = async () => {
       await getProducts();
@@ -81,9 +77,8 @@ export default function QuantityPage() {
     fetchProducts();
   }, []);
 
-  // =========================
   // START EDITING
-  // =========================
+
   const startEditing = (productId: string, field: "price" | "stock") => {
     setEditingCell({
       productId,
@@ -91,9 +86,8 @@ export default function QuantityPage() {
     });
   };
 
-  // =========================
   // HANDLE INPUT CHANGE
-  // =========================
+
   const handleChange = (
     product: Product,
     field: "price" | "stock",
@@ -116,9 +110,8 @@ export default function QuantityPage() {
     }));
   };
 
-  // =========================
   // SAVE ALL CHANGES
-  // =========================
+
   const saveAllChanges = async () => {
     try {
       setSaving(true);
@@ -180,24 +173,16 @@ export default function QuantityPage() {
     }
   };
 
-  // =========================
-  // IMAGE URL FIX
-  // =========================
   const getImageSrc = (image: string) => {
     if (!image) return "";
 
-    // already full URL
     if (image.startsWith("http")) {
       return image;
     }
 
-    // relative path
     return `${IMAGE_BASE_URL}${image}`;
   };
 
-  // =========================
-  // LOADING
-  // =========================
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20 text-slate-500">
@@ -208,7 +193,6 @@ export default function QuantityPage() {
 
   return (
     <div className="space-y-6" dir="rtl">
-      {/* HEADER */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-slate-800">
           مدیریت قیمت و موجودی
@@ -249,10 +233,8 @@ export default function QuantityPage() {
                   key={p._id}
                   className="border-b transition hover:bg-slate-50"
                 >
-                  {/* INDEX */}
                   <td className="p-3 text-center">{index + 1}</td>
 
-                  {/* IMAGE */}
                   <td className="p-3">
                     <div className="h-12 w-12 overflow-hidden rounded-lg bg-slate-100">
                       {p.images.length ? (
@@ -271,10 +253,8 @@ export default function QuantityPage() {
                     </div>
                   </td>
 
-                  {/* NAME */}
                   <td className="p-3 font-semibold text-slate-700">{p.name}</td>
 
-                  {/* PRICE */}
                   <td
                     onDoubleClick={() => startEditing(p._id, "price")}
                     className="cursor-pointer p-3"
@@ -297,7 +277,6 @@ export default function QuantityPage() {
                     )}
                   </td>
 
-                  {/* STOCK */}
                   <td
                     onDoubleClick={() => startEditing(p._id, "stock")}
                     className="cursor-pointer p-3"
@@ -325,7 +304,6 @@ export default function QuantityPage() {
           </tbody>
         </table>
 
-        {/* EMPTY */}
         {products.length === 0 && (
           <div className="py-10 text-center text-slate-500">
             محصولی یافت نشد

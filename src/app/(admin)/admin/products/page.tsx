@@ -12,12 +12,9 @@ const BASE_URL = "https://maktab-shop.runflare.run";
 const getImageSrc = (image: string) => {
   if (!image) return "";
 
-  // if backend already returns full URL
   if (image.startsWith("http")) {
     return image;
   }
-
-  // if backend returns relative path
   return `${BASE_URL}${image}`;
 };
 type Product = {
@@ -51,8 +48,6 @@ export default function ProductsPage() {
 
   const [newImages, setNewImages] = useState<FileList | null>(null);
 
-  // FETCH PRODUCTS
-
   const getProducts = async () => {
     try {
       setLoading(true);
@@ -81,7 +76,7 @@ export default function ProductsPage() {
     }
   };
 
-  // OPEN EDIT MODAL
+  //EDIT MODAL
 
   const openEditModal = (product: Product) => {
     setSelectedProduct(product);
@@ -98,14 +93,14 @@ export default function ProductsPage() {
     setShowEditModal(true);
   };
 
-  // OPEN DELETE MODAL
+  //DELETE MODAL
 
   const openDeleteModal = (product: Product) => {
     setSelectedProduct(product);
     setShowDeleteModal(true);
   };
 
-  // CLOSE EDIT MODAL
+  // CLOSE
 
   const closeEditModal = () => {
     setShowEditModal(false);
@@ -121,8 +116,6 @@ export default function ProductsPage() {
     setNewImages(null);
   };
 
-  // UPDATE PRODUCT
-
   const updateProduct = async () => {
     if (!selectedProduct) return;
 
@@ -133,7 +126,7 @@ export default function ProductsPage() {
 
       const formData = new FormData();
 
-      // append only changed fields
+      //changed fields
       if (editForm.name !== selectedProduct.name) {
         formData.append("name", editForm.name);
       }
@@ -150,13 +143,10 @@ export default function ProductsPage() {
         formData.append("category", editForm.category);
       }
 
-      // append new images
+      //new images
       if (newImages && newImages.length > 0) {
         Array.from(newImages).forEach((file) => {
           formData.append("images", file);
-
-          // if backend needs this:
-          // formData.append("images[]", file);
         });
       }
 
@@ -173,7 +163,7 @@ export default function ProductsPage() {
 
       const updatedProduct = res.data?.data || res.data?.product || res.data;
 
-      // update UI instantly
+      // update UI
       setProducts((prev) =>
         prev.map((product) =>
           product._id === selectedProduct._id
@@ -193,8 +183,6 @@ export default function ProductsPage() {
       setUpdating(false);
     }
   };
-
-  // DELETE PRODUCT
 
   const deleteProduct = async () => {
     if (!selectedProduct) return;
@@ -231,8 +219,6 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  // LOADING
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20 text-slate-500">
@@ -243,10 +229,9 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-6" dir="rtl">
-      {/* HEADER */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-slate-800">لیست محصولات</h1>
-        {/* add product button */}
+
         <Link
           href="/admin/products/create"
           className="rounded-xl bg-slate-800 px-4 py-2 text-white"
@@ -255,7 +240,6 @@ export default function ProductsPage() {
         </Link>
       </div>
 
-      {/* TABLE */}
       <div className="overflow-x-auto rounded-2xl border bg-white shadow">
         <table className="w-full text-sm">
           <thead className="bg-slate-900 text-white">
@@ -273,10 +257,8 @@ export default function ProductsPage() {
           <tbody>
             {products.map((p, index) => (
               <tr key={p._id} className="border-b transition hover:bg-slate-50">
-                {/* INDEX */}
                 <td className="p-3 text-center">{index + 1}</td>
 
-                {/* IMAGE */}
                 <td className="p-3">
                   <div className="h-12 w-12 overflow-hidden rounded-lg bg-slate-100">
                     {p.images.length ? (
@@ -295,22 +277,16 @@ export default function ProductsPage() {
                   </div>
                 </td>
 
-                {/* NAME */}
                 <td className="p-3 font-semibold text-slate-700">{p.name}</td>
 
-                {/* PRICE */}
                 <td className="p-3">{p.price?.toLocaleString()} تومان</td>
 
-                {/* STOCK */}
                 <td className="p-3">{p.stock}</td>
 
-                {/* CATEGORY */}
                 <td className="p-3">{p.category}</td>
 
-                {/* ACTIONS */}
                 <td className="p-3">
                   <div className="flex items-center gap-2">
-                    {/* EDIT */}
                     <button
                       onClick={() => openEditModal(p)}
                       className="rounded-lg bg-blue-100 p-2 text-blue-600 hover:bg-blue-200"
@@ -318,7 +294,6 @@ export default function ProductsPage() {
                       <Pencil size={16} />
                     </button>
 
-                    {/* DELETE */}
                     <button
                       onClick={() => openDeleteModal(p)}
                       className="rounded-lg bg-red-100 p-2 text-red-600 hover:bg-red-200"
@@ -339,12 +314,9 @@ export default function ProductsPage() {
         )}
       </div>
 
-      {/* EDIT MODAL */}
-
       {showEditModal && selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="relative w-[500px] rounded-2xl bg-white p-6 shadow-xl">
-            {/* CLOSE */}
             <button
               onClick={closeEditModal}
               className="absolute left-3 top-3 text-slate-400 hover:text-slate-700"
@@ -352,13 +324,11 @@ export default function ProductsPage() {
               ✕
             </button>
 
-            {/* TITLE */}
             <h2 className="mb-6 text-xl font-bold text-slate-800">
               ویرایش محصول
             </h2>
 
             <div className="space-y-4">
-              {/* NAME */}
               <input
                 type="text"
                 placeholder="نام محصول"
@@ -372,7 +342,6 @@ export default function ProductsPage() {
                 className="w-full rounded-lg border p-3 outline-none focus:border-slate-500"
               />
 
-              {/* PRICE */}
               <input
                 type="number"
                 placeholder="قیمت"
@@ -386,7 +355,6 @@ export default function ProductsPage() {
                 className="w-full rounded-lg border p-3 outline-none focus:border-slate-500"
               />
 
-              {/* STOCK */}
               <input
                 type="number"
                 placeholder="موجودی"
@@ -400,7 +368,6 @@ export default function ProductsPage() {
                 className="w-full rounded-lg border p-3 outline-none focus:border-slate-500"
               />
 
-              {/* CATEGORY */}
               <input
                 type="text"
                 placeholder="دسته بندی"
@@ -437,7 +404,6 @@ export default function ProductsPage() {
                 </div>
               )}
 
-              {/* NEW IMAGES */}
               <div>
                 <label className="mb-2 block text-sm text-slate-600">
                   افزودن تصاویر جدید
@@ -451,7 +417,6 @@ export default function ProductsPage() {
                 />
               </div>
 
-              {/* ACTIONS */}
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={closeEditModal}
@@ -478,7 +443,6 @@ export default function ProductsPage() {
       {showDeleteModal && selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="relative w-[400px] rounded-2xl bg-white p-6 shadow-xl">
-            {/* CLOSE */}
             <button
               onClick={() => {
                 setShowDeleteModal(false);
@@ -500,7 +464,6 @@ export default function ProductsPage() {
               {selectedProduct.name}
             </p>
 
-            {/* ACTIONS */}
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => {
