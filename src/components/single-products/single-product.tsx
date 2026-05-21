@@ -29,6 +29,7 @@ export default function SingleProductPage({ productId }: Props) {
   const [selectedImage, setSelectedImage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -79,194 +80,123 @@ export default function SingleProductPage({ productId }: Props) {
       img.startsWith("http") ? img : `${BASE_URL}${img}`,
     ) || [];
 
+  const handleAddToCart = async () => {
+    try {
+      if (!product) return;
+
+      if (product.stock <= 0) {
+        toast.error("این محصول ناموجود است");
+        return;
+      }
+
+      if (quantity > product.stock) {
+        toast.error("موجودی کافی نیست");
+        return;
+      }
+
+      setAdding(true);
+
+      const token = localStorage.getItem("admin_token");
+
+      await axios.post(
+        `${API_URL}/cart/add`,
+        {
+          productId: product._id,
+          quantity,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      toast.success(
+        <div className="flex flex-col gap-2">
+          <span>محصول به سبد خرید اضافه شد</span>
+          <a
+            href="/cart"
+            className="text-sm font-bold text-orange-500 hover:underline"
+          >
+            برو به سبد خرید
+          </a>
+        </div>,
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error("خطا در افزودن به سبد خرید");
+    } finally {
+      setAdding(false);
+    }
+  };
+
   return (
-    <section
-      dir="rtl"
-      className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-10 mt-10"
-    >
+    <section dir="rtl" className="min-h-screen bg-slate-50 py-10 mt-20">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
-        {/* Breadcrumb */}
-        <div className="mb-8 flex items-center gap-2 text-sm text-slate-500">
-          <span>خانه</span>
-          <span>/</span>
-          <span>{product.category}</span>
-          <span>/</span>
-          <span>{product.name}</span>
-        </div>
-
         <div className="grid gap-10 lg:grid-cols-2">
-          {/*  GALLERY  */}
-          <div className="flex flex-col-reverse gap-4 lg:flex-row">
-            {/* Thumbnails */}
-            <div className="flex gap-3 lg:flex-col">
-              {images.map((img, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(img)}
-                  className={`relative h-24 w-24 overflow-hidden rounded-2xl border-2 ${
-                    selectedImage === img
-                      ? "border-orange-500"
-                      : "border-transparent"
-                  }`}
-                >
-                  <Image
-                    src={img}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-
-            {/* Main Image */}
-            <div className="relative flex-1 overflow-hidden rounded-[32px] bg-white shadow-xl">
-              <div className="relative aspect-square w-full">
-                <Image
-                  src={selectedImage || images[0] || "/image/placeholder.png"}
-                  alt={product.name}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-contain p-6 transition duration-500 hover:scale-105"
-                />
-              </div>
-            </div>
+          <div className="relative overflow-hidden rounded-3xl bg-white shadow-xl">
+            <Image
+              src={selectedImage || images[0] || "/placeholder.png"}
+              alt={product.name}
+              fill
+              className="object-contain p-6"
+            />
           </div>
 
-          {/*  INFO  */}
           <div>
-            {/* Category */}
-            <div className="mb-3 inline-flex rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-600">
-              {product.category}
-            </div>
+            <h1 className="text-4xl font-black">{product.name}</h1>
 
-            {/* Title */}
-            <h1 className="text-3xl font-black leading-[60px] text-slate-900 md:text-5xl">
-              {product.name}
-            </h1>
-
-            {/* Meta */}
-            <div className="mt-5 flex flex-wrap items-center gap-5 text-sm text-slate-500">
-              <span>کد محصول: {product._id.slice(-6)}</span>
-
-              {product.brand && (
-                <>
-                  <span className="h-1 w-1 rounded-full bg-slate-300" />
-                  <span>برند: {product.brand}</span>
-                </>
-              )}
-
-              <span className="h-1 w-1 rounded-full bg-slate-300" />
-
+            <div className="mt-3">
               <span
-                className={
+                className={`text-sm font-bold ${
                   product.stock > 0 ? "text-green-600" : "text-red-500"
-                }
+                }`}
               >
-                {product.stock > 0 ? "موجود در انبار" : "ناموجود"}
+                {product.stock > 0 ? `موجودی: ${product.stock}` : "ناموجود"}
               </span>
             </div>
 
-            {/* Price */}
-            <div className="mt-8 flex items-end gap-4">
-              <span className="text-4xl font-black text-orange-500 md:text-5xl">
-                {product.price.toLocaleString("fa-IR")}
-              </span>
-
-              <span className="pb-1 text-lg font-bold text-slate-600">
-                تومان
-              </span>
+            <div className="mt-6 text-3xl font-black text-orange-500">
+              {product.price.toLocaleString("fa-IR")} تومان
             </div>
 
-            {/* Description */}
-            <p className="mt-8 leading-9 text-slate-600">
+            <p className="mt-6 text-slate-600 leading-8">
               {product.description}
             </p>
 
-            {/* Quantity */}
-            <div className="mt-10">
-              <h3 className="mb-4 font-bold text-slate-800">تعداد</h3>
+            <div className="mt-8 flex items-center gap-4">
+              <button
+                onClick={() => setQuantity((p) => Math.max(1, p - 1))}
+                className="h-10 w-10 rounded-xl text-white flex items-center justify-center bg-linear-to-r from-orange-500 to-amber-400"
+              >
+                <Minus size={18} />
+              </button>
 
-              <div className="flex h-14 w-fit items-center overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                <button
-                  onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                  className="flex h-full w-14 items-center justify-center hover:bg-slate-100"
-                >
-                  <Minus size={18} />
-                </button>
+              <span className="w-10 text-center font-bold">{quantity}</span>
 
-                <div className="flex h-full w-16 items-center justify-center border-x border-slate-200 text-lg font-bold">
-                  {quantity}
-                </div>
-
-                <button
-                  onClick={() => setQuantity((prev) => prev + 1)}
-                  className="flex h-full w-14 items-center justify-center hover:bg-slate-100"
-                >
-                  <Plus size={18} />
-                </button>
-              </div>
+              <button
+                onClick={() => setQuantity((p) => p + 1)}
+                className="h-10 w-10 rounded-xl text-white flex items-center justify-center bg-linear-to-r from-orange-500 to-amber-400"
+              >
+                <Plus size={18} />
+              </button>
             </div>
 
-            {/* Actions */}
-            <div className="mt-12 flex flex-col gap-4 sm:flex-row">
-              <button
-                onClick={() => {
-                  // Get existing cart from localStorage
-                  const existingCart = JSON.parse(
-                    localStorage.getItem("cart") || "[]",
-                  );
+            <button
+              onClick={handleAddToCart}
+              disabled={adding || product.stock === 0}
+              className="mt-10 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-orange-500 to-amber-400 font-bold text-white disabled:opacity-50"
+            >
+              <ShoppingBag />
+              {adding ? "در حال افزودن..." : "افزودن به سبد خرید"}
+            </button>
 
-                  // Check if product already exists
-                  const existingProductIndex = existingCart.findIndex(
-                    (item: Product & { quantity: number }) =>
-                      item._id === product._id,
-                  );
-
-                  if (existingProductIndex !== -1) {
-                    // Increase quantity if product already exists
-                    existingCart[existingProductIndex].quantity += quantity;
-                  } else {
-                    // Add new product to cart
-                    existingCart.push({
-                      ...product,
-                      quantity,
-                    });
-                  }
-
-                  // Save updated cart
-                  localStorage.setItem("cart", JSON.stringify(existingCart));
-
-                  // Show success toast
-                  toast.success(
-                    <div className="flex flex-col gap-2">
-                      <span>محصول با موفقیت به سبد خرید اضافه شد</span>
-
-                      <a
-                        href="/cart"
-                        className="text-sm font-bold text-orange-500 hover:underline"
-                      >
-                        برو به سبد خرید
-                      </a>
-                    </div>,
-                    {
-                      duration: 4000,
-                    },
-                  );
-                }}
-                className="group flex h-16 flex-1 items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-8 text-lg font-bold text-white shadow-xl cursor-pointer"
-              >
-                <ShoppingBag size={22} />
-                افزودن به سبد خرید
+            <div className="mt-6 flex gap-4">
+              <button className="rounded-xl border p-3">
+                <Heart />
               </button>
-
-              <button className="flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 hover:text-orange-500">
-                <Heart size={22} />
-              </button>
-
-              <button className="flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 hover:text-orange-500">
-                <Share2 size={22} />
+              <button className="rounded-xl border p-3">
+                <Share2 />
               </button>
             </div>
           </div>
