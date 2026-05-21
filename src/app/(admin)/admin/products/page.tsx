@@ -5,9 +5,11 @@ import axios from "axios";
 import Image from "next/image";
 import { Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
+import Pagination from "@/src/shared/components/pagination";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
 const BASE_URL = "https://maktab-shop.runflare.run";
+const ITEMS_PER_PAGE = 10;
 
 const getImageSrc = (image: string) => {
   if (!image) return "";
@@ -17,6 +19,7 @@ const getImageSrc = (image: string) => {
   }
   return `${BASE_URL}${image}`;
 };
+
 type Product = {
   _id: string;
   name: string;
@@ -28,16 +31,12 @@ type Product = {
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
-
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
   const [showEditModal, setShowEditModal] = useState(false);
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const [loading, setLoading] = useState(true);
-
   const [updating, setUpdating] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [editForm, setEditForm] = useState({
     name: "",
@@ -77,7 +76,6 @@ export default function ProductsPage() {
   };
 
   //EDIT MODAL
-
   const openEditModal = (product: Product) => {
     setSelectedProduct(product);
 
@@ -89,18 +87,14 @@ export default function ProductsPage() {
     });
 
     setNewImages(null);
-
     setShowEditModal(true);
   };
 
   //DELETE MODAL
-
   const openDeleteModal = (product: Product) => {
     setSelectedProduct(product);
     setShowDeleteModal(true);
   };
-
-  // CLOSE
 
   const closeEditModal = () => {
     setShowEditModal(false);
@@ -123,7 +117,6 @@ export default function ProductsPage() {
       setUpdating(true);
 
       const token = localStorage.getItem("admin_token");
-
       const formData = new FormData();
 
       //changed fields
@@ -203,21 +196,54 @@ export default function ProductsPage() {
 
       setShowDeleteModal(false);
       setSelectedProduct(null);
+
+      // اگر در صفحه آخر بودیم و تنها آیتم آن حذف شد، به صفحه قبل برگردیم
+      if (paginatedProducts.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
     } catch (error) {
       console.error("Delete failed:", error);
       alert("خطا در حذف محصول");
     }
   };
-
   // INITIAL FETCH
-
   useEffect(() => {
     const fetchProducts = async () => {
-      await getProducts();
+      try {
+        // نیازی به setLoading(true) در اینجا نیست چون مقدار اولیه آن در استیت true است
+        const res = await axios.get(`${API_URL}/products`, {
+          params: {
+            page: 1,
+            limit: 100,
+          },
+        });
+
+        const productsData =
+          res.data?.data?.products ||
+          res.data?.data?.items ||
+          res.data?.data ||
+          res.data?.products ||
+          res.data ||
+          [];
+
+        setProducts(Array.isArray(productsData) ? productsData : []);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchProducts();
   }, []);
+
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedProducts = products.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
 
   if (loading) {
     return (
@@ -255,15 +281,16 @@ export default function ProductsPage() {
           </thead>
 
           <tbody>
-            {products.map((p, index) => (
+            {paginatedProducts.map((p, index) => (
               <tr key={p._id} className="border-b transition hover:bg-slate-50">
-                <td className="p-3 text-center">{index + 1}</td>
+                {/* محاسبه شماره ردیف صحیح برای هر صفحه */}
+                <td className="p-3 text-center">{startIndex + index + 1}</td>
 
                 <td className="p-3">
                   <div className="h-12 w-12 overflow-hidden rounded-lg bg-slate-100">
                     {p.images.length ? (
                       <Image
-                        src={`${p.images[0]}`}
+                        src={getImageSrc(p.images[0])}
                         alt={p.name}
                         width={50}
                         height={50}
@@ -314,6 +341,17 @@ export default function ProductsPage() {
         )}
       </div>
 
+      {totalPages > 1 && (
+        <div className="mt-6 flex justify-center pb-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
+
+      {/* EDIT MODAL */}
       {showEditModal && selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="relative w-[500px] rounded-2xl bg-white p-6 shadow-xl">
@@ -439,7 +477,6 @@ export default function ProductsPage() {
       )}
 
       {/* DELETE MODAL */}
-
       {showDeleteModal && selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="relative w-[400px] rounded-2xl bg-white p-6 shadow-xl">

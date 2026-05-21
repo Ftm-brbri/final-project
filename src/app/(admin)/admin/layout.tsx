@@ -34,8 +34,6 @@ export default function AdminLayout({
         return;
       }
 
-      // ✅ IMPORTANT FIX:
-      // delay state update to next tick (prevents React warning)
       queueMicrotask(() => {
         setIsChecking(false);
       });

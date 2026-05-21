@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Pagination from "@/src/shared/components/pagination";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
 
@@ -14,70 +15,88 @@ type Order = {
     phone?: string;
     address?: string;
   };
+
   status: string;
   createdAt: string;
 };
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-
   const [loading, setLoading] = useState(true);
 
-  
-  // GET ORDERS
-  
-  const getOrders = async () => {
-    try {
-      setLoading(true);
+  const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
+  const [confirmedOrders, setConfirmedOrders] = useState<Order[]>([]);
 
-      // FIXED TOKEN NAME
-      const token = localStorage.getItem("admin_token");
+  const [pendingPage, setPendingPage] = useState(1);
+  const [confirmedPage, setConfirmedPage] = useState(1);
 
-      const res = await axios.get(`${API_URL}/orders/admin/all`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+  const [pendingTotalPages, setPendingTotalPages] = useState(1);
+  const [confirmedTotalPages, setConfirmedTotalPages] = useState(1);
 
-        params: {
-          page: 1,
-          limit: 50,
-        },
-      });
+  const fetchOrders = async (status: "pending" | "confirmed", page: number) => {
+    const token = localStorage.getItem("admin_token");
 
-      console.log("ORDERS RESPONSE:", res.data);
+    const res = await axios.get(`${API_URL}/orders/admin/all`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        page,
+        limit: 6,
+        status,
+      },
+    });
 
-      // safer response parsing
-      const ordersData =
-        res.data?.data?.orders ||
-        res.data?.data?.items ||
-        res.data?.orders ||
-        res.data?.data ||
-        [];
+    const data =
+      res.data?.data?.orders ||
+      res.data?.data?.items ||
+      res.data?.orders ||
+      res.data?.data ||
+      [];
 
-      setOrders(Array.isArray(ordersData) ? ordersData : []);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
+    const totalPages = res.data?.data?.totalPages || 1;
 
-      setOrders([]);
-    } finally {
-      setLoading(false);
-    }
+    return {
+      data: Array.isArray(data) ? data : [],
+      totalPages,
+    };
   };
 
-  
-  // FETCH ON LOAD
-  
   useEffect(() => {
-    const fetchOrders = async () => {
-      await getOrders();
+    let mounted = true;
+
+    const load = async () => {
+      try {
+        setLoading(true);
+
+        const [pending, confirmed] = await Promise.all([
+          fetchOrders("pending", pendingPage),
+          fetchOrders("confirmed", confirmedPage),
+        ]);
+
+        if (!mounted) return;
+
+        setPendingOrders(pending.data);
+        setConfirmedOrders(confirmed.data);
+
+        setPendingTotalPages(pending.totalPages);
+        setConfirmedTotalPages(confirmed.totalPages);
+      } catch (error) {
+        console.error("Orders fetch error:", error);
+
+        setPendingOrders([]);
+        setConfirmedOrders([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     };
 
-    fetchOrders();
-  }, []);
+    load();
 
-  
-  // LOADING
-  
+    return () => {
+      mounted = false;
+    };
+  }, [pendingPage, confirmedPage]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20 text-slate-500">
@@ -86,79 +105,97 @@ export default function OrdersPage() {
     );
   }
 
-  return (
-    <div className="space-y-6" dir="rtl">
-      {/* HEADER */}
+  const OrderCard = ({ order }: { order: Order }) => (
+    <div className="rounded-2xl border bg-white p-4 shadow-sm hover:shadow transition">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-black text-slate-800">لیست سفارشات</h1>
+        <p className="font-mono text-xs text-slate-500">{order._id}</p>
+
+        <span
+          className={`px-3 py-1 text-xs font-bold rounded-full ${
+            order.status === "pending"
+              ? "bg-yellow-100 text-yellow-700"
+              : "bg-green-100 text-green-700"
+          }`}
+        >
+          {order.status === "pending" ? "در انتظار" : "تأیید شده"}
+        </span>
       </div>
 
-      {/* TABLE */}
-      <div className="overflow-x-auto rounded-2xl border bg-white shadow">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-900 text-white">
-            <tr>
-              <th className="p-3">ردیف</th>
-              <th className="p-3">شماره سفارش</th>
-              <th className="p-3">نام مشتری</th>
-              <th className="p-3">شهر</th>
-              <th className="p-3">مبلغ کل</th>
-              <th className="p-3">وضعیت ارسال</th>
-              <th className="p-3">تاریخ</th>
-            </tr>
-          </thead>
+      <div className="mt-3 space-y-1">
+        <p className="font-semibold text-slate-800">
+          {order.shippingAddress?.name || "نامشخص"}
+        </p>
 
-          <tbody>
-            {orders.map((order, index) => (
-              <tr
-                key={order._id}
-                className="border-b transition hover:bg-slate-50"
-              >
-                {/* INDEX */}
-                <td className="p-3 text-center">{index + 1}</td>
+        <p className="text-sm text-slate-500">
+          {order.shippingAddress?.address || "-"}
+        </p>
 
-                {/* ORDER ID */}
-                <td className="p-3 font-mono text-xs">{order._id}</td>
+        <p className="text-sm font-bold text-slate-900">
+          {order.totalPrice?.toLocaleString()} تومان
+        </p>
 
-                {/* CUSTOMER */}
-                <td className="p-3 font-semibold text-slate-700">
-                  {order.shippingAddress?.name || "نامشخص"}
-                </td>
+        <p className="text-xs text-slate-400">
+          {new Date(order.createdAt).toLocaleDateString("fa-IR")}
+        </p>
+      </div>
+    </div>
+  );
 
-                <td className="p-3">{order.shippingAddress?.address || "-"}</td>
+  return (
+    <div className="space-y-10" dir="rtl">
+      <h1 className="text-2xl font-black text-slate-800">لیست سفارشات</h1>
 
-                {/* PRICE */}
-                <td className="p-3">
-                  {order.totalPrice?.toLocaleString()} تومان
-                </td>
+      <section className="space-y-4">
+        <h2 className="text-lg font-bold text-yellow-600">
+          🟡 سفارشات در انتظار
+        </h2>
 
-                {/* STATUS */}
-                <td className="p-3">
-                  {order.status === "pending"
-                    ? "در انتظار"
-                    : order.status === "shipped"
-                      ? "ارسال شده"
-                      : order.status === "delivered"
-                        ? "تحویل شده"
-                        : order.status}
-                </td>
+        {pendingOrders.length === 0 ? (
+          <p className="text-sm text-slate-400">سفارشی در انتظار وجود ندارد</p>
+        ) : (
+          <>
+            <div className="grid gap-3 md:grid-cols-2">
+              {pendingOrders.map((order) => (
+                <div key={order._id} className="border-l-4 border-yellow-400">
+                  <OrderCard order={order} />
+                </div>
+              ))}
+            </div>
 
-                {/* DATE */}
-                <td className="p-3 text-xs text-slate-500">
-                  {new Date(order.createdAt).toLocaleDateString("fa-IR")}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* EMPTY */}
-        {orders.length === 0 && (
-          <div className="py-10 text-center text-slate-500">
-            سفارشی یافت نشد
-          </div>
+            <Pagination
+              currentPage={pendingPage}
+              totalPages={pendingTotalPages}
+              onPageChange={setPendingPage}
+            />
+          </>
         )}
-      </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-lg font-bold text-green-600">
+          🟢 سفارشات تأیید شده
+        </h2>
+
+        {confirmedOrders.length === 0 ? (
+          <p className="text-sm text-slate-400">سفارشی تأیید شده وجود ندارد</p>
+        ) : (
+          <>
+            <div className="grid gap-3 md:grid-cols-2">
+              {confirmedOrders.map((order) => (
+                <div key={order._id} className="border-l-4 border-green-400">
+                  <OrderCard order={order} />
+                </div>
+              ))}
+            </div>
+
+            <Pagination
+              currentPage={confirmedPage}
+              totalPages={confirmedTotalPages}
+              onPageChange={setConfirmedPage}
+            />
+          </>
+        )}
+      </section>
     </div>
   );
 }

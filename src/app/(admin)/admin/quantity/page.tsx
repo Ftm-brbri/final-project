@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
+import Pagination from "@/src/shared/components/pagination";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
 const IMAGE_BASE_URL = "https://maktab-shop.runflare.run";
@@ -20,12 +21,15 @@ type EditableFields = {
   stock: number;
 };
 
+const ITEMS_PER_PAGE = 10; // تعداد محصولات در هر صفحه
+
 export default function QuantityPage() {
   const [products, setProducts] = useState<Product[]>([]);
-
   const [loading, setLoading] = useState(true);
-
   const [saving, setSaving] = useState(false);
+
+  // استیت مربوط به صفحه‌بندی
+  const [currentPage, setCurrentPage] = useState(1);
 
   // current
   const [editingCell, setEditingCell] = useState<{
@@ -38,47 +42,38 @@ export default function QuantityPage() {
     Record<string, EditableFields>
   >({});
 
-  const getProducts = async () => {
-    try {
-      setLoading(true);
-
-      const res = await axios.get(`${API_URL}/products`, {
-        params: {
-          page: 1,
-          limit: 100,
-        },
-      });
-
-      const productsData =
-        res.data?.data?.products ||
-        res.data?.data?.items ||
-        res.data?.data ||
-        res.data?.products ||
-        res.data ||
-        [];
-
-      setProducts(Array.isArray(productsData) ? productsData : []);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // FETCH ON LOAD
-
   useEffect(() => {
     const fetchProducts = async () => {
-      await getProducts();
+      try {
+        const res = await axios.get(`${API_URL}/products`, {
+          params: {
+            page: 1,
+            limit: 100, // فعلاً همه را می‌گیریم تا سمت کلاینت صفحه‌بندی کنیم
+          },
+        });
+
+        const productsData =
+          res.data?.data?.products ||
+          res.data?.data?.items ||
+          res.data?.data ||
+          res.data?.products ||
+          res.data ||
+          [];
+
+        setProducts(Array.isArray(productsData) ? productsData : []);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchProducts();
   }, []);
 
   // START EDITING
-
   const startEditing = (productId: string, field: "price" | "stock") => {
     setEditingCell({
       productId,
@@ -87,7 +82,6 @@ export default function QuantityPage() {
   };
 
   // HANDLE INPUT CHANGE
-
   const handleChange = (
     product: Product,
     field: "price" | "stock",
@@ -95,13 +89,11 @@ export default function QuantityPage() {
   ) => {
     setEditedValues((prev) => ({
       ...prev,
-
       [product._id]: {
         price:
           field === "price"
             ? Number(value)
             : (prev[product._id]?.price ?? product.price),
-
         stock:
           field === "stock"
             ? Number(value)
@@ -111,18 +103,14 @@ export default function QuantityPage() {
   };
 
   // SAVE ALL CHANGES
-
   const saveAllChanges = async () => {
     try {
       setSaving(true);
-
       const token = localStorage.getItem("admin_token");
-
       const changedProducts = Object.entries(editedValues);
 
       if (changedProducts.length === 0) {
         alert("تغییری انجام نشده");
-
         return;
       }
 
@@ -148,9 +136,7 @@ export default function QuantityPage() {
       setProducts((prev) =>
         prev.map((product) => {
           const edited = editedValues[product._id];
-
           if (!edited) return product;
-
           return {
             ...product,
             price: edited.price,
@@ -166,7 +152,6 @@ export default function QuantityPage() {
       alert("همه تغییرات ذخیره شدند");
     } catch (error) {
       console.error("Save failed:", error);
-
       alert("خطا در ذخیره تغییرات");
     } finally {
       setSaving(false);
@@ -175,11 +160,9 @@ export default function QuantityPage() {
 
   const getImageSrc = (image: string) => {
     if (!image) return "";
-
     if (image.startsWith("http")) {
       return image;
     }
-
     return `${IMAGE_BASE_URL}${image}`;
   };
 
@@ -190,6 +173,14 @@ export default function QuantityPage() {
       </div>
     );
   }
+
+  // محاسبات صفحه‌بندی
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedProducts = products.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -221,11 +212,9 @@ export default function QuantityPage() {
           </thead>
 
           <tbody>
-            {products.map((p, index) => {
+            {paginatedProducts.map((p, index) => {
               const edited = editedValues[p._id];
-
               const currentPrice = edited?.price ?? p.price;
-
               const currentStock = edited?.stock ?? p.stock;
 
               return (
@@ -233,13 +222,14 @@ export default function QuantityPage() {
                   key={p._id}
                   className="border-b transition hover:bg-slate-50"
                 >
-                  <td className="p-3 text-center">{index + 1}</td>
+                  {/* محاسبه شماره ردیف با توجه به صفحه فعلی */}
+                  <td className="p-3 text-center">{startIndex + index + 1}</td>
 
                   <td className="p-3">
                     <div className="h-12 w-12 overflow-hidden rounded-lg bg-slate-100">
                       {p.images.length ? (
                         <Image
-                          src={`${p.images[0]}`}
+                          src={getImageSrc(p.images[0])} // از تابع خودتان برای آدرس عکس استفاده شد
                           alt={p.name}
                           width={50}
                           height={50}
@@ -307,6 +297,17 @@ export default function QuantityPage() {
         {products.length === 0 && (
           <div className="py-10 text-center text-slate-500">
             محصولی یافت نشد
+          </div>
+        )}
+
+        {/* نمایش کامپوننت صفحه‌بندی در پایین جدول */}
+        {totalPages > 1 && (
+          <div className="mt-4 flex justify-center pb-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           </div>
         )}
       </div>
