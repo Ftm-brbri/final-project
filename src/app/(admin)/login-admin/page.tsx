@@ -3,26 +3,125 @@
 import axiosInstance from "@/src/lib/axios";
 import { Eye, EyeOff, Lock, Mail, ShieldCheck, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const ADMIN_TOKEN_KEY = "admin_token";
 const ADMIN_USER_KEY = "admin_user";
+const ADMIN_REFRESH_TOKEN_KEY = "admin_refresh_token";
+
+type AdminUser = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+};
 
 type LoginResponse = {
   success: boolean;
   message: string;
   data?: {
-    user: {
-      id: string;
-      name: string;
-      email: string;
-      phone: string;
-      role: string;
-    };
+    user: AdminUser;
     token: string;
     refreshToken: string;
   };
 };
+
+type MeResponse = {
+  success: boolean;
+  data?: {
+    _id: string;
+    name: string;
+    email: string;
+    phone: string;
+    role: string;
+  };
+};
+
+type RefreshResponse = {
+  success: boolean;
+  message: string;
+  data?: {
+    token: string;
+    refreshToken: string;
+  };
+};
+
+function clearAdminAuth() {
+  window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+  window.localStorage.removeItem(ADMIN_USER_KEY);
+  window.localStorage.removeItem(ADMIN_REFRESH_TOKEN_KEY);
+}
+
+function saveAdminUser(me: NonNullable<MeResponse["data"]>) {
+  window.localStorage.setItem(
+    ADMIN_USER_KEY,
+    JSON.stringify({
+      id: me._id,
+      name: me.name,
+      email: me.email,
+      phone: me.phone,
+      role: me.role,
+    }),
+  );
+}
+
+async function fetchCurrentAdmin(): Promise<AdminUser | null> {
+  const { data } = await axiosInstance.get<MeResponse>("/auth/me");
+
+  if (!data?.success || !data.data || data.data.role !== "admin") {
+    return null;
+  }
+
+  saveAdminUser(data.data);
+
+  return {
+    id: data.data._id,
+    name: data.data.name,
+    email: data.data.email,
+    phone: data.data.phone,
+    role: data.data.role,
+  };
+}
+
+async function tryRefreshAdminToken(): Promise<boolean> {
+  const refreshToken = window.localStorage.getItem(ADMIN_REFRESH_TOKEN_KEY);
+
+  if (!refreshToken) return false;
+
+  const { data } = await axiosInstance.post<RefreshResponse>(
+    "/auth/refresh-token",
+    { refreshToken },
+  );
+
+  if (!data?.success || !data.data) return false;
+
+  window.localStorage.setItem(ADMIN_TOKEN_KEY, data.data.token);
+  window.localStorage.setItem(ADMIN_REFRESH_TOKEN_KEY, data.data.refreshToken);
+
+  return true;
+}
+
+async function validateAdminSession(): Promise<boolean> {
+  const token = window.localStorage.getItem(ADMIN_TOKEN_KEY);
+
+  if (!token) return false;
+
+  try {
+    const user = await fetchCurrentAdmin();
+    return user !== null;
+  } catch {
+    try {
+      const refreshed = await tryRefreshAdminToken();
+      if (!refreshed) return false;
+
+      const user = await fetchCurrentAdmin();
+      return user !== null;
+    } catch {
+      return false;
+    }
+  }
+}
 
 export default function Page() {
   const router = useRouter();
@@ -34,30 +133,41 @@ export default function Page() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const isValidToken = useMemo(() => {
-    if (typeof window === "undefined") return false;
-
-    const token = window.localStorage.getItem(ADMIN_TOKEN_KEY);
-    const rawUser = window.localStorage.getItem(ADMIN_USER_KEY);
-
-    if (!token || !rawUser) return false;
-
-    try {
-      const user = JSON.parse(rawUser) as { role?: string };
-
-      return user?.role === "admin";
-    } catch {
-      return false;
-    }
-  }, []);
+  const [authStatus, setAuthStatus] = useState<
+    "checking" | "valid" | "invalid"
+  >("checking");
 
   useEffect(() => {
-    console.log("here is called", isValidToken);
-    if (isValidToken) {
-      router.push("/admin");
+    let cancelled = false;
+
+    async function checkExistingSession() {
+      const token = window.localStorage.getItem(ADMIN_TOKEN_KEY);
+
+      if (!token) {
+        if (!cancelled) setAuthStatus("invalid");
+        return;
+      }
+
+      const isValid = await validateAdminSession();
+
+      if (cancelled) return;
+
+      if (isValid) {
+        setAuthStatus("valid");
+        router.replace("/admin");
+        return;
+      }
+
+      clearAdminAuth();
+      setAuthStatus("invalid");
     }
-  }, [isValidToken, router]);
+
+    checkExistingSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -97,7 +207,7 @@ export default function Page() {
       );
 
       window.localStorage.setItem(
-        "admin_refresh_token",
+        ADMIN_REFRESH_TOKEN_KEY,
         data.data.refreshToken,
       );
 
@@ -123,7 +233,7 @@ export default function Page() {
     }
   }
 
-  if (isValidToken) {
+  if (authStatus === "checking" || authStatus === "valid") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950">
         <div className="flex flex-col items-center gap-4">

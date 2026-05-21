@@ -3,10 +3,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
+import Link from "next/link";
 import { Heart, Minus, Plus, Share2, ShoppingBag } from "lucide-react";
 import toast from "react-hot-toast";
+import { addToCart, getCartItemCount } from "@/src/lib/cart-api";
+import { isUserLoggedIn } from "@/src/lib/auth-keys";
+import { notifyCartUpdated } from "@/src/lib/cart-events";
+import { setCartItemCount } from "@/src/store/cartSlice";
+import { useDispatch } from "react-redux";
+import { API_BASE_URL } from "@/src/lib/userAxios";
 
-const API_URL = "https://maktab-shop.runflare.run/api";
 const BASE_URL = "https://maktab-shop.runflare.run";
 
 type Product = {
@@ -25,6 +31,7 @@ type Props = {
 };
 
 export default function SingleProductPage({ productId }: Props) {
+  const dispatch = useDispatch();
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -36,7 +43,7 @@ export default function SingleProductPage({ productId }: Props) {
       try {
         setLoading(true);
 
-        const res = await axios.get(`${API_URL}/products/${productId}`);
+        const res = await axios.get(`${API_BASE_URL}/products/${productId}`);
 
         const data = res.data?.data || res.data?.product || res.data;
 
@@ -81,49 +88,49 @@ export default function SingleProductPage({ productId }: Props) {
     ) || [];
 
   const handleAddToCart = async () => {
+    if (!product) return;
+
+    if (!isUserLoggedIn()) {
+      toast.error("برای افزودن به سبد خرید ابتدا وارد شوید");
+      return;
+    }
+
+    if (product.stock <= 0) {
+      toast.error("این محصول ناموجود است");
+      return;
+    }
+
+    if (quantity > product.stock) {
+      toast.error("موجودی کافی نیست");
+      return;
+    }
+
     try {
-      if (!product) return;
-
-      if (product.stock <= 0) {
-        toast.error("این محصول ناموجود است");
-        return;
-      }
-
-      if (quantity > product.stock) {
-        toast.error("موجودی کافی نیست");
-        return;
-      }
-
       setAdding(true);
 
-      const token = localStorage.getItem("admin_token");
+      const res = await addToCart(product._id, quantity);
 
-      await axios.post(
-        `${API_URL}/cart/add`,
-        {
-          productId: product._id,
-          quantity,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      if (!res?.success) {
+        toast.error(res?.message || "خطا در افزودن به سبد خرید");
+        return;
+      }
+
+      const count = getCartItemCount(res.data ?? null);
+      dispatch(setCartItemCount(count));
+      notifyCartUpdated(count);
 
       toast.success(
         <div className="flex flex-col gap-2">
-          <span>محصول به سبد خرید اضافه شد</span>
-          <a
+          <span>{res.message || "محصول به سبد خرید اضافه شد"}</span>
+          <Link
             href="/cart"
             className="text-sm font-bold text-orange-500 hover:underline"
           >
             برو به سبد خرید
-          </a>
+          </Link>
         </div>,
       );
-    } catch (err) {
-      console.error(err);
+    } catch {
       toast.error("خطا در افزودن به سبد خرید");
     } finally {
       setAdding(false);

@@ -2,9 +2,21 @@
 
 import { format } from "date-fns-jalali";
 import { Bell, Clock3, Search, User } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function AdminHeader() {
-  const currentDate = format(new Date(), "yyyy/MM/dd - HH:mm");
+  const [currentDate, setCurrentDate] = useState(() =>
+    format(new Date(), "yyyy/MM/dd - HH:mm:ss"),
+  );
+
+  useEffect(() => {
+    const update = () =>
+      setCurrentDate(format(new Date(), "yyyy/MM/dd - HH:mm:ss"));
+
+    const interval = setInterval(update, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <header

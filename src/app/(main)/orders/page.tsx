@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>orders</div>;
+import { redirect } from "next/navigation";
+
+export default function OrdersPage() {
+  redirect("/profile?tab=orders");
 }

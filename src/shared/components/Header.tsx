@@ -5,6 +5,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { fetchCart, getCartItemCount } from "@/src/lib/cart-api";
+import { CART_UPDATED_EVENT } from "@/src/lib/cart-events";
+import { isUserLoggedIn } from "@/src/lib/auth-keys";
+import { getStoredUserProfile } from "@/src/lib/user-api";
+import { setCartItemCount } from "@/src/store/cartSlice";
+import { useDispatch } from "react-redux";
+import type { RootState } from "@/src/store/store";
 
 const navItems = [
   {
@@ -27,9 +35,13 @@ const navItems = [
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
+  const dispatch = useDispatch();
+  const cartCount = useSelector((state: RootState) => state.cart.itemCount);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,13 +55,47 @@ export default function Header() {
     };
   }, []);
 
+  useEffect(() => {
+    setLoggedIn(isUserLoggedIn());
+    const user = getStoredUserProfile();
+    setUserName(user?.name || "");
+  }, [pathname]);
+
+  useEffect(() => {
+    async function loadCartCount() {
+      if (!isUserLoggedIn()) {
+        dispatch(setCartItemCount(0));
+        return;
+      }
+
+      try {
+        const cart = await fetchCart();
+        dispatch(setCartItemCount(getCartItemCount(cart)));
+      } catch {
+        dispatch(setCartItemCount(0));
+      }
+    }
+
+    loadCartCount();
+
+    const onCartUpdated = (e: Event) => {
+      const detail = (e as CustomEvent<{ itemCount: number }>).detail;
+      if (detail?.itemCount !== undefined) {
+        dispatch(setCartItemCount(detail.itemCount));
+      }
+    };
+
+    window.addEventListener(CART_UPDATED_EVENT, onCartUpdated);
+    return () => window.removeEventListener(CART_UPDATED_EVENT, onCartUpdated);
+  }, [dispatch]);
+
   return (
     <header
       dir="rtl"
       className={`fixed top-0 z-50 w-full transition-all duration-300 ${
         isScrolled
-          ? "border-b border-white/10 bg-slate-950/85 shadow-2xl backdrop-blur-2xl"
-          : "bg-transparent"
+          ? "border-b border-orange-500/25 bg-slate-900/95 shadow-xl shadow-black/30 backdrop-blur-xl"
+          : "border-b border-transparent bg-gradient-to-b from-slate-950/95 via-slate-950/75 to-slate-950/0 backdrop-blur-md"
       }`}
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 md:px-8">
@@ -58,7 +104,7 @@ export default function Header() {
           {/* Mobile Menu */}
           <button
             onClick={() => setIsOpen(true)}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur-xl transition hover:bg-white/10 lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-orange-500/30 bg-slate-800/80 text-amber-50 backdrop-blur-xl transition hover:border-orange-400 hover:bg-orange-500/20 lg:hidden"
           >
             <Menu size={22} />
           </button>
@@ -86,14 +132,14 @@ export default function Header() {
                       href={item.href}
                       className={`relative text-sm font-bold transition ${
                         isActive
-                          ? "text-orange-400"
-                          : "text-slate-200 hover:text-white"
+                          ? "text-amber-300"
+                          : "text-slate-100/90 hover:text-amber-200"
                       }`}
                     >
                       {item.label}
 
                       {isActive && (
-                        <span className="absolute -bottom-2 right-0 h-[3px] w-full rounded-full bg-orange-500" />
+                        <span className="absolute -bottom-2 right-0 h-[3px] w-full rounded-full bg-gradient-to-l from-orange-500 to-amber-400 shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
                       )}
                     </Link>
                   </li>
@@ -104,19 +150,19 @@ export default function Header() {
         </div>
         {/* Center Search */}
         <div className="hidden w-full max-w-xl lg:block">
-          <div className="flex items-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl transition focus-within:border-orange-500 w-90">
-            <div className="px-4 text-slate-400">
+          <div className="flex w-90 items-center overflow-hidden rounded-2xl border border-slate-600/50 bg-slate-800/70 shadow-inner shadow-black/20 backdrop-blur-xl transition focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-500/25">
+            <div className="px-4 text-orange-400/80">
               <Search size={20} />
             </div>
 
             <input
               type="text"
               placeholder="جستجو در اسپرتکس..."
-              className="w-full bg-transparent px-2 py-4 text-sm text-white outline-none placeholder:text-slate-500"
+              className="w-full bg-transparent px-2 py-4 text-sm text-slate-100 outline-none placeholder:text-slate-400"
             />
 
-            <div className="border-r border-white/10 px-4">
-              <select className="bg-transparent text-sm text-slate-300 outline-none">
+            <div className="border-r border-slate-600/50 px-4">
+              <select className="bg-transparent text-sm text-amber-100/90 outline-none">
                 <option className="text-black">همه دسته‌بندی‌ها</option>
                 <option className="text-black">کفش ورزشی</option>
                 <option className="text-black">لباس ورزشی</option>
@@ -129,18 +175,35 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/cart")}
-            className="hidden h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur-xl transition hover:bg-orange-500 lg:flex"
+            className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-orange-500/30 bg-slate-800/80 text-amber-50 backdrop-blur-xl transition hover:border-orange-400 hover:bg-orange-500/25 hover:text-orange-200"
           >
             <ShoppingCart size={20} />
+            {cartCount > 0 && (
+              <span className="absolute -left-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-1 text-[10px] font-bold text-white shadow-md shadow-orange-500/50">
+                {cartCount > 99 ? "99+" : cartCount.toLocaleString("fa-IR")}
+              </span>
+            )}
           </button>
 
-          <button
-            onClick={() => router.push("/auth")}
-            className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-5 py-3 text-sm font-bold text-white shadow-xl shadow-orange-500/20 transition hover:scale-[1.03]"
-          >
-            <User size={18} />
-            ورود / ثبت‌نام
-          </button>
+          {loggedIn ? (
+            <Link
+              href="/profile"
+              className="flex items-center gap-2 rounded-2xl border border-orange-400/40 bg-orange-500/15 px-5 py-3 text-sm font-bold text-amber-50 backdrop-blur-xl transition hover:border-orange-400 hover:bg-orange-500/30 hover:text-white"
+            >
+              <User size={18} />
+              <span className="hidden sm:inline">
+                {userName || "پروفایل"}
+              </span>
+            </Link>
+          ) : (
+            <button
+              onClick={() => router.push("/auth")}
+              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-orange-600/40 transition hover:scale-[1.03] hover:from-orange-600 hover:to-amber-500 hover:shadow-orange-500/50"
+            >
+              <User size={18} />
+              ورود / ثبت‌نام
+            </button>
+          )}
         </div>
       </div>
 
@@ -148,13 +211,13 @@ export default function Header() {
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm lg:hidden"
         />
       )}
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed right-0 top-0 z-50 flex h-full w-[85%] max-w-sm flex-col bg-slate-950 p-6 shadow-2xl transition-transform duration-300 lg:hidden ${
+        className={`fixed right-0 top-0 z-50 flex h-full w-[85%] max-w-sm flex-col border-l border-orange-500/20 bg-gradient-to-b from-slate-900 to-slate-950 p-6 shadow-2xl shadow-black/50 transition-transform duration-300 lg:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -169,7 +232,7 @@ export default function Header() {
 
           <button
             onClick={() => setIsOpen(false)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-orange-500/30 bg-slate-800 text-amber-50 transition hover:bg-orange-500/20"
           >
             <X size={22} />
           </button>
@@ -188,8 +251,8 @@ export default function Header() {
                     onClick={() => setIsOpen(false)}
                     className={`block rounded-2xl px-5 py-4 text-sm font-bold transition ${
                       isActive
-                        ? "bg-orange-500 text-white"
-                        : "bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
+                        ? "bg-gradient-to-l from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/30"
+                        : "border border-transparent bg-slate-800/60 text-slate-200 hover:border-orange-500/30 hover:bg-slate-800 hover:text-amber-100"
                     }`}
                   >
                     {item.label}
@@ -197,6 +260,60 @@ export default function Header() {
                 </li>
               );
             })}
+            <li>
+              <Link
+                href="/cart"
+                onClick={() => setIsOpen(false)}
+                className={`flex items-center justify-between rounded-2xl px-5 py-4 text-sm font-bold transition ${
+                  pathname === "/cart"
+                    ? "bg-gradient-to-l from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/30"
+                    : "border border-transparent bg-slate-800/60 text-slate-200 hover:border-orange-500/30 hover:bg-slate-800 hover:text-amber-100"
+                }`}
+              >
+                سبد خرید
+                {cartCount > 0 && (
+                  <span className="rounded-full bg-amber-400/30 px-2 py-0.5 text-xs text-amber-100">
+                    {cartCount.toLocaleString("fa-IR")}
+                  </span>
+                )}
+              </Link>
+            </li>
+            {loggedIn ? (
+              <>
+                <li>
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsOpen(false)}
+                    className={`block rounded-2xl px-5 py-4 text-sm font-bold transition ${
+                      pathname === "/profile"
+                        ? "bg-gradient-to-l from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/30"
+                        : "border border-transparent bg-slate-800/60 text-slate-200 hover:border-orange-500/30 hover:bg-slate-800 hover:text-amber-100"
+                    }`}
+                  >
+                    پروفایل
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/profile?tab=orders"
+                    onClick={() => setIsOpen(false)}
+                    className="block rounded-2xl border border-transparent bg-slate-800/60 px-5 py-4 text-sm font-bold text-slate-200 transition hover:border-orange-500/30 hover:bg-slate-800 hover:text-amber-100"
+                  >
+                    سفارش‌های من
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <li>
+                <Link
+                  href="/auth"
+                  onClick={() => setIsOpen(false)}
+                  className="block rounded-2xl bg-gradient-to-l from-orange-500 to-amber-500 px-5 py-4 text-sm font-bold text-white shadow-md shadow-orange-500/30"
+                >
+                  ورود / ثبت‌نام
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       </div>

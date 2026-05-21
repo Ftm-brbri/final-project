@@ -1,15 +1,29 @@
 "use client";
-import { loginFormSchema, LoginFormSchemaType } from "@/src/schema/login-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
+import { loginFormSchema, LoginFormSchemaType } from "@/src/schema/login-form";
+import { saveUserSession } from "@/src/lib/userAxios";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import userAxios from "@/src/lib/userAxios";
+import toast from "react-hot-toast";
+
+type LoginResponse = {
+  success: boolean;
+  message: string;
+  data?: {
+    user: Record<string, unknown>;
+    token: string;
+    refreshToken: string;
+  };
+};
 
 function SignIn() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -17,8 +31,37 @@ function SignIn() {
     formState: { errors },
   } = useForm<LoginFormSchemaType>({ resolver: zodResolver(loginFormSchema) });
 
-  function onSubmit(data: LoginFormSchemaType) {
-    console.log(data);
+  async function onSubmit(data: LoginFormSchemaType) {
+    try {
+      setIsSubmitting(true);
+
+      const { data: res } = await userAxios.post<LoginResponse>("/auth/login", {
+        email: data.userName.trim(),
+        password: data.password,
+      });
+
+      if (!res?.success || !res.data) {
+        toast.error(res?.message || "خطا در ورود");
+        return;
+      }
+
+      saveUserSession(res.data);
+      toast.success(res.message || "ورود با موفقیت انجام شد");
+      router.push("/profile");
+    } catch (err: unknown) {
+      let message = "نام کاربری یا کلمه عبور اشتباه است";
+
+      if (typeof err === "object" && err !== null && "response" in err) {
+        const errorResponse = err as {
+          response?: { data?: { message?: string } };
+        };
+        message = errorResponse.response?.data?.message || message;
+      }
+
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -33,9 +76,9 @@ function SignIn() {
           </div>
 
           <div className="flex flex-col gap-2 mt-2.5 w-full h-24">
-            <label>نام کاربری</label>
+            <label>ایمیل</label>
             <input
-              type="text"
+              type="email"
               {...register("userName")}
               className="border-2 border-amber-400 w-full rounded-md px-1.5 py-1 outline-none"
             />
@@ -103,10 +146,10 @@ function SignIn() {
 
           <button
             type="submit"
-            className="bg-gradient-to-br from-orange-500 to-amber-400 text-white text-lg flex items-center justify-center py-1 rounded-md my-4.5 w-full hover:bg-text cursor-pointer"
-            onClick={() => router.push("/")}
+            disabled={isSubmitting}
+            className="bg-gradient-to-br from-orange-500 to-amber-400 text-white text-lg flex items-center justify-center py-1 rounded-md my-4.5 w-full hover:bg-text cursor-pointer disabled:opacity-70"
           >
-            ورود
+            {isSubmitting ? "در حال ورود..." : "ورود"}
           </button>
 
           <div className="flex justify-center items-center gap-2.5 m-3">

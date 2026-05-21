@@ -1,38 +1,22 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// ۱. تعریف دقیق ساختار یک محصول در سبد خرید
-export interface CartItem {
-  id: string | number;
-  title: string;
-  price: number;
-  quantity: number;
-  // در صورت نیاز فیلدهای دیگر مثل عکس، سایز، رنگ و... را اینجا اضافه کنید
-  // image?: string;
-}
-
-// ۲. استفاده از این تایپ به جای any
 interface CartState {
-  items: CartItem[]; flag : boolean
+  itemCount: number;
 }
 
 const initialState: CartState = {
-  items: [],
-  flag:false
+  itemCount: 0,
 };
 
 const cartSlice = createSlice({
-  name: 'cart',
+  name: "cart",
   initialState,
   reducers: {
-    // ۳. مشخص کردن نوع ورودی اکشن
-    addToCart: (state, action: PayloadAction<CartItem>) => {
-      state.items.push(action.payload);
-    },
-    updateFlag: (state, action: PayloadAction<boolean>) => {
-      state.flag=action.payload
+    setCartItemCount: (state, action: PayloadAction<number>) => {
+      state.itemCount = action.payload;
     },
   },
 });
 
-export const { addToCart,updateFlag } = cartSlice.actions;
+export const { setCartItemCount } = cartSlice.actions;
 export default cartSlice.reducer;

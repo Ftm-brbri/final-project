@@ -3,13 +3,30 @@ import {
   signupFormSchema,
   SignupFormSchemaType,
 } from "@/src/schema/signup-form";
+import { saveUserSession } from "@/src/lib/userAxios";
+import userAxios from "@/src/lib/userAxios";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useState } from "react"; // Import useState
+import { useState } from "react";
+import toast from "react-hot-toast";
+
+type RegisterResponse = {
+  success: boolean;
+  message: string;
+  data?: {
+    user: Record<string, unknown>;
+    token: string;
+    refreshToken: string;
+  };
+};
 
 function SignUp() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -18,8 +35,43 @@ function SignUp() {
   } = useForm<SignupFormSchemaType>({
     resolver: zodResolver(signupFormSchema),
   });
-  function onSubmit(data: SignupFormSchemaType) {
-    console.log(data);
+
+  async function onSubmit(data: SignupFormSchemaType) {
+    try {
+      setIsSubmitting(true);
+      const email = data.userName.trim();
+
+      const { data: res } = await userAxios.post<RegisterResponse>(
+        "/auth/register",
+        {
+          name: email.split("@")[0] || email,
+          email,
+          password: data.password,
+        },
+      );
+
+      if (!res?.success || !res.data) {
+        toast.error(res?.message || "خطا در ثبت‌نام");
+        return;
+      }
+
+      saveUserSession(res.data);
+      toast.success(res.message || "ثبت‌نام با موفقیت انجام شد");
+      router.push("/profile");
+    } catch (err: unknown) {
+      let message = "خطا در ثبت‌نام";
+
+      if (typeof err === "object" && err !== null && "response" in err) {
+        const errorResponse = err as {
+          response?: { data?: { message?: string } };
+        };
+        message = errorResponse.response?.data?.message || message;
+      }
+
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
   return (
     <div
@@ -39,9 +91,9 @@ function SignUp() {
             ثبت‌نام و ایجاد حساب کاربری
           </div>
           <div className="flex flex-col gap-2 mt-2.5 w-full h-24">
-            <label>نام کاربری</label>
+            <label>ایمیل</label>
             <input
-              type="text"
+              type="email"
               {...register("userName")}
               className="border-2 border-amber-400 w-full rounded-md px-1.5 py-1 outline-none"
             />
@@ -165,10 +217,20 @@ function SignUp() {
           </div>
           <button
             type="submit"
-            className="bg-gradient-to-br from-orange-500 to-amber-400 text-white  text-lg flex items-center justify-center py-1 rounded-md my-4.5 w-full hover:bg-text cursor-pointer"
+            disabled={isSubmitting}
+            className="bg-gradient-to-br from-orange-500 to-amber-400 text-white  text-lg flex items-center justify-center py-1 rounded-md my-4.5 w-full hover:bg-text cursor-pointer disabled:opacity-70"
           >
-            ثبت نام
+            {isSubmitting ? "در حال ثبت‌نام..." : "ثبت نام"}
           </button>
+
+          <div className="flex justify-center items-center gap-2.5 m-3">
+            <div>قبلاً ثبت‌نام کرده‌اید؟</div>
+            <Link href="/auth">
+              <div className="cursor-pointer text-text border-b border-b-text">
+                ورود
+              </div>
+            </Link>
+          </div>
         </form>
       </div>
     </div>

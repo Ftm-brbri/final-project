@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ADMIN_TOKEN_KEY } from "@/src/lib/auth-keys";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://maktab-shop.runflare.run/api";
 
@@ -6,7 +7,7 @@ let token: string | null = null;
 
 // This helper updates token value when used in client
 if (typeof window !== "undefined") {
-  token = window.localStorage.getItem("admin_token");
+  token = window.localStorage.getItem(ADMIN_TOKEN_KEY);
 }
 
 const axiosInstance = axios.create({
@@ -21,7 +22,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
-      const adminToken = window.localStorage.getItem("admin_token");
+      const adminToken = window.localStorage.getItem(ADMIN_TOKEN_KEY);
       if (adminToken) {
         config.headers.Authorization = `Bearer ${adminToken}`;
       } else {
