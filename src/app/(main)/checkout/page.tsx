@@ -140,7 +140,9 @@ export default function CheckoutPage() {
         className="flex min-h-[60vh] items-center justify-center bg-slate-50 pt-24"
       >
         <div className="rounded-3xl bg-white p-10 text-center shadow-sm">
-          <p className="text-lg font-bold text-slate-800">سبد خرید شما خالی است</p>
+          <p className="text-lg font-bold text-slate-800">
+            سبد خرید شما خالی است
+          </p>
           <Link
             href="/products"
             className="mt-6 inline-block rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-8 py-3 font-bold text-white"
@@ -179,7 +181,7 @@ export default function CheckoutPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full bg-transparent outline-none"
-                    placeholder="علی احمدی"
+                    placeholder="نام کاربری"
                   />
                 </div>
               </div>
@@ -195,7 +197,7 @@ export default function CheckoutPage() {
                     onChange={(e) => setPhone(e.target.value)}
                     dir="ltr"
                     className="w-full bg-transparent text-left outline-none"
-                    placeholder="09123456789"
+                    placeholder="شماره تماس"
                   />
                 </div>
               </div>
@@ -209,7 +211,7 @@ export default function CheckoutPage() {
                   onChange={(e) => setAddress(e.target.value)}
                   rows={3}
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-orange-500"
-                  placeholder="تهران، خیابان ولیعصر، پلاک 123"
+                  placeholder="نشانی"
                 />
               </div>
             </div>

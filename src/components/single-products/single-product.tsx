@@ -32,6 +32,7 @@ type Props = {
 
 export default function SingleProductPage({ productId }: Props) {
   const dispatch = useDispatch();
+
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -91,7 +92,26 @@ export default function SingleProductPage({ productId }: Props) {
     if (!product) return;
 
     if (!isUserLoggedIn()) {
-      toast.error("برای افزودن به سبد خرید ابتدا وارد شوید");
+      toast(
+        (t) => (
+          <div className="flex flex-col gap-3 bg-linear-to-r from-orange-100 to-amber-100">
+            <span className="font-bold text-sm text-slate-800">
+              برای افزودن به سبد خرید ابتدا وارد شوید
+            </span>
+
+            <a
+              href="/auth"
+              className="text-sm font-bold text-orange-500 underline"
+              onClick={() => toast.dismiss(t.id)}
+            >
+              رفتن به صفحه ورود
+            </a>
+          </div>
+        ),
+        {
+          duration: 5000,
+        },
+      );
       return;
     }
 
@@ -116,19 +136,29 @@ export default function SingleProductPage({ productId }: Props) {
       }
 
       const count = getCartItemCount(res.data ?? null);
+
       dispatch(setCartItemCount(count));
       notifyCartUpdated(count);
 
       toast.success(
-        <div className="flex flex-col gap-2">
-          <span>{res.message || "محصول به سبد خرید اضافه شد"}</span>
-          <Link
-            href="/cart"
-            className="text-sm font-bold text-orange-500 hover:underline"
-          >
-            برو به سبد خرید
-          </Link>
-        </div>,
+        (t) => (
+          <div className="flex flex-col gap-2">
+            <span className="text-sm">
+              {res.message || "محصول به سبد خرید اضافه شد"}
+            </span>
+
+            <a
+              href="/cart"
+              className="text-sm font-bold text-orange-500 underline"
+              onClick={() => toast.dismiss(t.id)}
+            >
+              رفتن به سبد خرید
+            </a>
+          </div>
+        ),
+        {
+          duration: 4000,
+        },
       );
     } catch {
       toast.error("خطا در افزودن به سبد خرید");
@@ -138,18 +168,22 @@ export default function SingleProductPage({ productId }: Props) {
   };
 
   return (
-    <section dir="rtl" className="min-h-screen bg-slate-50 py-10 mt-20">
+    <section dir="rtl" className="min-h-screen bg-slate-50 py-10 mt-30">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         <div className="grid gap-10 lg:grid-cols-2">
-          <div className="relative overflow-hidden rounded-3xl bg-white shadow-xl">
+          {/* ✅ FIXED RESPONSIVE IMAGE */}
+          <div className="relative w-full aspect-square sm:aspect-[4/4] lg:aspect-square min-h-[320px] overflow-hidden rounded-3xl bg-white shadow-xl">
             <Image
               src={selectedImage || images[0] || "/placeholder.png"}
               alt={product.name}
               fill
-              className="object-contain p-6"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-contain p-4 sm:p-6"
+              priority
             />
           </div>
 
+          {/* INFO */}
           <div>
             <h1 className="text-4xl font-black">{product.name}</h1>
 
@@ -171,10 +205,11 @@ export default function SingleProductPage({ productId }: Props) {
               {product.description}
             </p>
 
+            {/* QUANTITY */}
             <div className="mt-8 flex items-center gap-4">
               <button
                 onClick={() => setQuantity((p) => Math.max(1, p - 1))}
-                className="h-10 w-10 rounded-xl text-white flex items-center justify-center bg-linear-to-r from-orange-500 to-amber-400"
+                className="h-10 w-10 rounded-xl text-white flex items-center justify-center bg-gradient-to-r from-orange-500 to-amber-400"
               >
                 <Minus size={18} />
               </button>
@@ -183,16 +218,17 @@ export default function SingleProductPage({ productId }: Props) {
 
               <button
                 onClick={() => setQuantity((p) => p + 1)}
-                className="h-10 w-10 rounded-xl text-white flex items-center justify-center bg-linear-to-r from-orange-500 to-amber-400"
+                className="h-10 w-10 rounded-xl text-white flex items-center justify-center bg-gradient-to-r from-orange-500 to-amber-400"
               >
                 <Plus size={18} />
               </button>
             </div>
 
+            {/* ADD TO CART */}
             <button
               onClick={handleAddToCart}
               disabled={adding || product.stock === 0}
-              className="mt-10 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-orange-500 to-amber-400 font-bold text-white disabled:opacity-50"
+              className="mt-10 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 font-bold text-white disabled:opacity-50"
             >
               <ShoppingBag />
               {adding ? "در حال افزودن..." : "افزودن به سبد خرید"}

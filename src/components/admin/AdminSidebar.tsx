@@ -57,26 +57,28 @@ export default function AdminSidebar() {
   ];
 
   return (
-    <aside className="flex h-screen w-72 flex-col border-l border-slate-800 bg-slate-950 text-white">
-      <div className="border-b border-slate-800 p-6">
-        <div className="flex items-center gap-4 rounded-3xl bg-gradient-to-br from-orange-500 to-amber-400 p-4 shadow-xl shadow-orange-500/20">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-xl">
-            <ShoppingBag size={28} />
+    <aside className="flex h-screen w-20 flex-col border-l border-slate-800 bg-slate-950 text-white transition-all duration-300 lg:w-72 shrink-0 z-50">
+      {/* Header */}
+      <div className="border-b border-slate-800 p-4 lg:p-6 flex justify-center lg:justify-start">
+        <div className="flex items-center gap-4 rounded-3xl lg:bg-linear-to-br lg:from-orange-500 lg:to-amber-400 p-2 lg:p-4 lg:shadow-xl lg:shadow-orange-500/20">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-500 lg:bg-white/20 lg:backdrop-blur-xl text-white">
+            <ShoppingBag size={24} />
           </div>
 
-          <div>
+          <div className="hidden lg:block">
             <h2 className="text-2xl font-extrabold">اسپرتکس</h2>
             <p className="mt-1 text-sm text-white/80">پنل مدیریت</p>
           </div>
         </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="mb-4 px-3 text-xs font-bold tracking-wider text-slate-500">
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-2 py-6 lg:px-4 overflow-x-hidden">
+        <div className="mb-4 hidden px-3 text-xs font-bold tracking-wider text-slate-500 lg:block">
           منوی مدیریت
         </div>
 
-        <ul className="space-y-2">
+        <ul className="space-y-3 lg:space-y-2">
           {menuItems.map((item, index) => {
             const isActive = pathname === item.href;
 
@@ -84,15 +86,16 @@ export default function AdminSidebar() {
               <li key={index}>
                 <Link
                   href={item.href}
-                  className={`group flex items-center justify-between rounded-2xl px-4 py-3 transition-all duration-200 ${
+                  title={item.name}
+                  className={`group flex items-center justify-center rounded-2xl p-3 transition-all duration-200 lg:justify-between lg:px-4 py-3 ${
                     isActive
-                      ? "bg-gradient-to-r from-orange-500 to-amber-400 text-white shadow-lg shadow-orange-500/20"
+                      ? "bg-linear-to-r from-orange-500 to-amber-400 text-white shadow-lg shadow-orange-500/20"
                       : "text-slate-300 hover:bg-slate-900 hover:text-white"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`rounded-xl p-2 ${
+                      className={`rounded-xl p-2 shrink-0 ${
                         isActive
                           ? "bg-white/20"
                           : "bg-slate-800 group-hover:bg-slate-700"
@@ -101,12 +104,14 @@ export default function AdminSidebar() {
                       {item.icon}
                     </div>
 
-                    <span className="font-medium">{item.name}</span>
+                    <span className="hidden font-medium whitespace-nowrap lg:block">
+                      {item.name}
+                    </span>
                   </div>
 
                   <ChevronLeft
                     size={18}
-                    className="opacity-60 transition group-hover:-translate-x-1"
+                    className="hidden opacity-60 transition group-hover:-translate-x-1 lg:block"
                   />
                 </Link>
               </li>
@@ -115,13 +120,17 @@ export default function AdminSidebar() {
         </ul>
       </nav>
 
-      <div className="space-y-3 border-t border-slate-800 p-4">
+      {/* Footer */}
+      <div className="space-y-3 border-t border-slate-800 p-3 lg:p-4">
         <Link
           href="/"
-          className="flex items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm transition hover:border-orange-500 hover:bg-orange-500 hover:text-white"
+          title="ورود به سایت"
+          className="flex items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-900 p-3 text-sm transition hover:border-orange-500 hover:bg-orange-500 hover:text-white lg:px-4 lg:py-3"
         >
-          <Globe size={18} />
-          ورود به سایت
+          <Globe size={20} className="shrink-0" />
+          <span className="hidden lg:inline whitespace-nowrap">
+            ورود به سایت
+          </span>
         </Link>
 
         <button
@@ -129,10 +138,13 @@ export default function AdminSidebar() {
             localStorage.clear();
             router.push("/login-admin");
           }}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-500/10 px-4 py-3 text-red-400 transition hover:bg-red-500 hover:text-white"
+          title="خروج از حساب"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-500/10 p-3 text-red-400 transition hover:bg-red-500 hover:text-white lg:px-4 lg:py-3"
         >
-          <LogOut size={18} />
-          خروج از حساب
+          <LogOut size={20} className="shrink-0" />
+          <span className="hidden lg:inline whitespace-nowrap">
+            خروج از حساب
+          </span>
         </button>
       </div>
     </aside>

@@ -354,7 +354,7 @@ export default function ProductsPage() {
       {/* EDIT MODAL */}
       {showEditModal && selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="relative w-[500px] rounded-2xl bg-white p-6 shadow-xl">
+          <div className="relative w-125 rounded-2xl bg-white p-6 shadow-xl">
             <button
               onClick={closeEditModal}
               className="absolute left-3 top-3 text-slate-400 hover:text-slate-700"
@@ -406,7 +406,7 @@ export default function ProductsPage() {
                 className="w-full rounded-lg border p-3 outline-none focus:border-slate-500"
               />
 
-              <input
+              <input //select option
                 type="text"
                 placeholder="دسته بندی"
                 value={editForm.category}

@@ -83,8 +83,7 @@ export default function Cart() {
     item: CartLineItem,
     type: "increase" | "decrease",
   ) => {
-    const nextQty =
-      type === "increase" ? item.quantity + 1 : item.quantity - 1;
+    const nextQty = type === "increase" ? item.quantity + 1 : item.quantity - 1;
 
     if (nextQty < 1) return;
 
@@ -188,7 +187,7 @@ export default function Cart() {
     return (
       <section dir="rtl" className="bg-slate-50 py-20">
         <div className="mx-auto max-w-7xl px-4 md:px-8">
-          <div className="flex flex-col items-center justify-center rounded-3xl bg-white p-16 text-center shadow-sm">
+          <div className="flex flex-col items-center justify-center min-h-screen rounded-3xl bg-white p-16 text-center shadow-sm">
             <ShoppingBag className="mb-6 h-20 w-20 text-slate-300" />
             <h2 className="text-2xl font-black text-slate-800">
               سبد خرید شما خالی است
@@ -236,8 +235,7 @@ export default function Cart() {
             {items.map((item) => {
               const isUpdating = updatingId === item._id;
               const categoryLabel =
-                CATEGORY_LABELS[item.product.category] ||
-                item.product.category;
+                CATEGORY_LABELS[item.product.category] || item.product.category;
 
               return (
                 <div
@@ -277,8 +275,7 @@ export default function Cart() {
                         </div>
 
                         <p className="mt-2 text-sm text-slate-500">
-                          موجودی:{" "}
-                          {item.product.stock.toLocaleString("fa-IR")}
+                          موجودی: {item.product.stock.toLocaleString("fa-IR")}
                         </p>
                       </div>
 
@@ -289,9 +286,7 @@ export default function Cart() {
                             onClick={() =>
                               handleUpdateQuantity(item, "decrease")
                             }
-                            disabled={
-                              isUpdating || item.quantity <= 1
-                            }
+                            disabled={isUpdating || item.quantity <= 1}
                             className="flex h-full w-12 items-center justify-center hover:bg-slate-50 disabled:opacity-40"
                           >
                             <Minus size={16} />
@@ -307,8 +302,7 @@ export default function Cart() {
                               handleUpdateQuantity(item, "increase")
                             }
                             disabled={
-                              isUpdating ||
-                              item.quantity >= item.product.stock
+                              isUpdating || item.quantity >= item.product.stock
                             }
                             className="flex h-full w-12 items-center justify-center hover:bg-slate-50 disabled:opacity-40"
                           >
