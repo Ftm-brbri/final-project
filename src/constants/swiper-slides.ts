@@ -19,6 +19,6 @@ export const slides = [
     subtitle: "اقتصادی و با کیفیت",
     button: "خرید کن!",
     imageMobile: "/image/1010_m.jpg",
-    imageDesktop: "/image/1010.jpg",
+    imageDesktop: "/image/1037.jpg",
   },
 ];

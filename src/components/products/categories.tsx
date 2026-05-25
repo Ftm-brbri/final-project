@@ -27,28 +27,28 @@ const categories: CategoryItem[] = [
     title: "کفش مردانه",
     subtitle: "مناسب دویدن و باشگاه",
     image: "/image/367-2.jpg",
-    category: "men",
+    category: "men shoes",
   },
   {
     id: 3,
     title: "کفش زنانه",
     subtitle: "استایل راحت و مدرن",
     image: "/image/367-1.jpg",
-    category: "women",
+    category: "women shoes",
   },
   {
     id: 4,
-    title: "تجهیزات ورزشی",
-    subtitle: "لوازم حرفه‌ای باشگاه",
-    image: "/image/367-6.jpg",
-    category: "equipment",
+    title: "لباس ورزشی زنانه",
+    subtitle: "پوشاک جذاب حرفه‌ای",
+    image: "/image/357-5.jpg",
+    category: "women",
   },
   {
     id: 5,
-    title: "لباس ورزشی",
+    title: "لباس ورزشی مردانه",
     subtitle: "پوشاک اسپرت حرفه‌ای",
-    image: "/image/367-5.jpg",
-    category: "set&&mne&&women",
+    image: "/image/3d85c22e6bb7fefcd9f5063f9ed65b5a03194878_1767522242.webp",
+    category: "men",
   },
 ];
 
@@ -63,7 +63,7 @@ function CategoryCard({
     <div
       onClick={onClick}
       className={`group relative overflow-hidden rounded-[28px] cursor-pointer ${
-        item.large ? "min-h-[620px]" : "min-h-[300px]"
+        item.large ? "min-h-155" : "min-h-75"
       }`}
     >
       {/* Image */}
@@ -75,7 +75,7 @@ function CategoryCard({
       />
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
 
       {/* Glow */}
       <div className="absolute inset-0 bg-orange-500/0 transition duration-500 group-hover:bg-orange-500/10" />
@@ -119,9 +119,9 @@ function Category() {
       {/* Background */}
       <div className="absolute inset-0 bg-slate-100" />
 
-      <div className="absolute top-0 left-0 h-[300px] w-[300px] rounded-full bg-orange-500/10 blur-[120px]" />
+      <div className="absolute top-0 left-0 h-75 w-75 rounded-full bg-orange-500/10 blur-[120px]" />
 
-      <div className="absolute bottom-0 right-0 h-[250px] w-[250px] rounded-full bg-amber-400/10 blur-[100px]" />
+      <div className="absolute bottom-0 right-0 h-62.5 w-62.5 rounded-full bg-amber-400/10 blur-[100px]" />
 
       <div className="relative mx-auto max-w-7xl px-4 md:px-8">
         {/* Header */}

@@ -28,7 +28,7 @@ export default function HeroSlider() {
                 <img
                   src={slide.imageMobile}
                   alt="slider image mobile"
-                  className="block md:hidden w-full h-full object-contain"
+                  className="block md:hidden w-full h-full object-contain object-top"
                 />
 
                 <img
