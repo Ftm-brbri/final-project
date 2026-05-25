@@ -21,35 +21,32 @@ type EditableFields = {
   stock: number;
 };
 
-const ITEMS_PER_PAGE = 10; // تعداد محصولات در هر صفحه
+const ITEMS_PER_PAGE = 10;
 
 export default function QuantityPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // استیت مربوط به صفحه‌بندی
   const [currentPage, setCurrentPage] = useState(1);
 
-  // current
   const [editingCell, setEditingCell] = useState<{
     productId: string;
     field: "price" | "stock";
   } | null>(null);
 
-  // edited values
   const [editedValues, setEditedValues] = useState<
     Record<string, EditableFields>
   >({});
 
-  // FETCH ON LOAD
+  // FETCH PRODUCTS
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await axios.get(`${API_URL}/products`, {
           params: {
             page: 1,
-            limit: 100, // فعلاً همه را می‌گیریم تا سمت کلاینت صفحه‌بندی کنیم
+            limit: 100,
           },
         });
 
@@ -81,7 +78,7 @@ export default function QuantityPage() {
     });
   };
 
-  // HANDLE INPUT CHANGE
+  // HANDLE CHANGE
   const handleChange = (
     product: Product,
     field: "price" | "stock",
@@ -94,6 +91,7 @@ export default function QuantityPage() {
           field === "price"
             ? Number(value)
             : (prev[product._id]?.price ?? product.price),
+
         stock:
           field === "stock"
             ? Number(value)
@@ -102,11 +100,13 @@ export default function QuantityPage() {
     }));
   };
 
-  // SAVE ALL CHANGES
+  // SAVE ALL
   const saveAllChanges = async () => {
     try {
       setSaving(true);
+
       const token = localStorage.getItem("admin_token");
+
       const changedProducts = Object.entries(editedValues);
 
       if (changedProducts.length === 0) {
@@ -114,7 +114,6 @@ export default function QuantityPage() {
         return;
       }
 
-      // SAVE ALL USING PROMISE.ALL
       await Promise.all(
         changedProducts.map(([productId, values]) =>
           axios.put(
@@ -132,11 +131,13 @@ export default function QuantityPage() {
         ),
       );
 
-      // UPDATE UI AFTER SUCCESS
+      // UPDATE UI
       setProducts((prev) =>
         prev.map((product) => {
           const edited = editedValues[product._id];
+
           if (!edited) return product;
+
           return {
             ...product,
             price: edited.price,
@@ -145,7 +146,7 @@ export default function QuantityPage() {
         }),
       );
 
-      // RESET
+      // RESET HIGHLIGHTS
       setEditedValues({});
       setEditingCell(null);
 
@@ -160,9 +161,11 @@ export default function QuantityPage() {
 
   const getImageSrc = (image: string) => {
     if (!image) return "";
+
     if (image.startsWith("http")) {
       return image;
     }
+
     return `${IMAGE_BASE_URL}${image}`;
   };
 
@@ -174,9 +177,11 @@ export default function QuantityPage() {
     );
   }
 
-  // محاسبات صفحه‌بندی
+  // PAGINATION
   const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+
   const paginatedProducts = products.slice(
     startIndex,
     startIndex + ITEMS_PER_PAGE,
@@ -184,6 +189,7 @@ export default function QuantityPage() {
 
   return (
     <div className="space-y-6" dir="rtl">
+      {/* HEADER */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-slate-800">
           مدیریت قیمت و موجودی
@@ -214,22 +220,28 @@ export default function QuantityPage() {
           <tbody>
             {paginatedProducts.map((p, index) => {
               const edited = editedValues[p._id];
+
               const currentPrice = edited?.price ?? p.price;
               const currentStock = edited?.stock ?? p.stock;
+
+              const isPriceChanged = edited && edited.price !== p.price;
+
+              const isStockChanged = edited && edited.stock !== p.stock;
 
               return (
                 <tr
                   key={p._id}
                   className="border-b transition hover:bg-slate-50"
                 >
-                  {/* محاسبه شماره ردیف با توجه به صفحه فعلی */}
+                  {/* INDEX */}
                   <td className="p-3 text-center">{startIndex + index + 1}</td>
 
+                  {/* IMAGE */}
                   <td className="p-3">
                     <div className="h-12 w-12 overflow-hidden rounded-lg bg-slate-100">
                       {p.images.length ? (
                         <Image
-                          src={getImageSrc(p.images[0])} // از تابع خودتان برای آدرس عکس استفاده شد
+                          src={getImageSrc(p.images[0])}
                           alt={p.name}
                           width={50}
                           height={50}
@@ -243,8 +255,10 @@ export default function QuantityPage() {
                     </div>
                   </td>
 
+                  {/* NAME */}
                   <td className="p-3 font-semibold text-slate-700">{p.name}</td>
 
+                  {/* PRICE */}
                   <td
                     onDoubleClick={() => startEditing(p._id, "price")}
                     className="cursor-pointer p-3"
@@ -258,15 +272,27 @@ export default function QuantityPage() {
                         onChange={(e) =>
                           handleChange(p, "price", e.target.value)
                         }
-                        className="w-[140px] rounded-lg border p-2 outline-none focus:border-orange-400"
+                        onBlur={() => setEditingCell(null)}
+                        className={`w-[140px] rounded-xl border p-2 outline-none transition ${
+                          isPriceChanged
+                            ? "border-orange-400 bg-orange-50 ring-2 ring-orange-200"
+                            : "border-slate-200"
+                        }`}
                       />
                     ) : (
-                      <span className="rounded-lg bg-orange-50 px-3 py-2 text-orange-700 hover:bg-orange-100">
+                      <span
+                        className={`inline-flex rounded-xl px-3 py-2 font-semibold transition ${
+                          isPriceChanged
+                            ? "bg-orange-100 text-orange-700 ring-2 ring-orange-200"
+                            : "bg-orange-50 text-orange-700 hover:bg-orange-100"
+                        }`}
+                      >
                         {currentPrice.toLocaleString()} تومان
                       </span>
                     )}
                   </td>
 
+                  {/* STOCK */}
                   <td
                     onDoubleClick={() => startEditing(p._id, "stock")}
                     className="cursor-pointer p-3"
@@ -280,10 +306,21 @@ export default function QuantityPage() {
                         onChange={(e) =>
                           handleChange(p, "stock", e.target.value)
                         }
-                        className="w-[100px] rounded-lg border p-2 outline-none focus:border-orange-400"
+                        onBlur={() => setEditingCell(null)}
+                        className={`w-[100px] rounded-xl border p-2 outline-none transition ${
+                          isStockChanged
+                            ? "border-blue-400 bg-blue-50 ring-2 ring-blue-200"
+                            : "border-slate-200"
+                        }`}
                       />
                     ) : (
-                      <span className="rounded-lg bg-slate-100 px-3 py-2">
+                      <span
+                        className={`inline-flex rounded-xl px-3 py-2 font-semibold transition ${
+                          isStockChanged
+                            ? "bg-blue-100 text-blue-700 ring-2 ring-blue-200"
+                            : "bg-slate-100 text-slate-700"
+                        }`}
+                      >
                         {currentStock}
                       </span>
                     )}
@@ -294,13 +331,14 @@ export default function QuantityPage() {
           </tbody>
         </table>
 
+        {/* EMPTY */}
         {products.length === 0 && (
           <div className="py-10 text-center text-slate-500">
             محصولی یافت نشد
           </div>
         )}
 
-        {/* نمایش کامپوننت صفحه‌بندی در پایین جدول */}
+        {/* PAGINATION */}
         {totalPages > 1 && (
           <div className="mt-4 flex justify-center pb-6">
             <Pagination

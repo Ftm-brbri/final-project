@@ -197,7 +197,6 @@ export default function ProductsPage() {
       setShowDeleteModal(false);
       setSelectedProduct(null);
 
-      // اگر در صفحه آخر بودیم و تنها آیتم آن حذف شد، به صفحه قبل برگردیم
       if (paginatedProducts.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
@@ -210,7 +209,6 @@ export default function ProductsPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // نیازی به setLoading(true) در اینجا نیست چون مقدار اولیه آن در استیت true است
         const res = await axios.get(`${API_URL}/products`, {
           params: {
             page: 1,
@@ -281,56 +279,115 @@ export default function ProductsPage() {
           </thead>
 
           <tbody>
-            {paginatedProducts.map((p, index) => (
-              <tr key={p._id} className="border-b transition hover:bg-slate-50">
-                {/* محاسبه شماره ردیف صحیح برای هر صفحه */}
-                <td className="p-3 text-center">{startIndex + index + 1}</td>
+            {paginatedProducts.map((p, index) => {
+              const isOutOfStock = p.stock === 0;
 
-                <td className="p-3">
-                  <div className="h-12 w-12 overflow-hidden rounded-lg bg-slate-100">
-                    {p.images.length ? (
-                      <Image
-                        src={getImageSrc(p.images[0])}
-                        alt={p.name}
-                        width={50}
-                        height={50}
-                        className="h-full w-full object-cover"
-                      />
+              return (
+                <tr
+                  key={p._id}
+                  className={`border-b transition ${
+                    isOutOfStock
+                      ? "bg-slate-100/80 opacity-70"
+                      : "hover:bg-slate-50"
+                  }`}
+                >
+                  {/* INDEX */}
+                  <td className="p-3 text-center">{startIndex + index + 1}</td>
+
+                  {/* IMAGE */}
+                  <td className="p-3">
+                    <div className="relative h-14 w-14 overflow-hidden rounded-xl bg-slate-100">
+                      {p.images.length ? (
+                        <>
+                          <Image
+                            src={getImageSrc(p.images[0])}
+                            alt={p.name}
+                            width={60}
+                            height={60}
+                            className={`h-full w-full object-cover ${
+                              isOutOfStock ? "grayscale" : ""
+                            }`}
+                          />
+
+                          {isOutOfStock && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                              <span className="rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">
+                                ناموجود
+                              </span>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-xs text-slate-400">
+                          no img
+                        </div>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* NAME */}
+                  <td
+                    className={`p-3 font-semibold ${
+                      isOutOfStock
+                        ? "text-slate-400 line-through"
+                        : "text-slate-700"
+                    }`}
+                  >
+                    {p.name}
+                  </td>
+
+                  {/* PRICE */}
+                  <td
+                    className={`p-3 ${
+                      isOutOfStock ? "text-slate-400" : "text-slate-700"
+                    }`}
+                  >
+                    {p.price?.toLocaleString()} تومان
+                  </td>
+
+                  {/* STOCK */}
+                  <td className="p-3">
+                    {isOutOfStock ? (
+                      <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-600">
+                        ناموجود
+                      </span>
                     ) : (
-                      <div className="flex h-full items-center justify-center text-xs text-slate-400">
-                        no img
-                      </div>
+                      <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-600">
+                        {p.stock} عدد
+                      </span>
                     )}
-                  </div>
-                </td>
+                  </td>
 
-                <td className="p-3 font-semibold text-slate-700">{p.name}</td>
+                  {/* CATEGORY */}
+                  <td
+                    className={`p-3 ${
+                      isOutOfStock ? "text-slate-400" : "text-slate-700"
+                    }`}
+                  >
+                    {p.category}
+                  </td>
 
-                <td className="p-3">{p.price?.toLocaleString()} تومان</td>
+                  {/* ACTIONS */}
+                  <td className="p-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openEditModal(p)}
+                        className="rounded-lg bg-blue-100 p-2 text-blue-600 transition hover:bg-blue-200"
+                      >
+                        <Pencil size={16} />
+                      </button>
 
-                <td className="p-3">{p.stock}</td>
-
-                <td className="p-3">{p.category}</td>
-
-                <td className="p-3">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => openEditModal(p)}
-                      className="rounded-lg bg-blue-100 p-2 text-blue-600 hover:bg-blue-200"
-                    >
-                      <Pencil size={16} />
-                    </button>
-
-                    <button
-                      onClick={() => openDeleteModal(p)}
-                      className="rounded-lg bg-red-100 p-2 text-red-600 hover:bg-red-200"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                      <button
+                        onClick={() => openDeleteModal(p)}
+                        className="rounded-lg bg-red-100 p-2 text-red-600 transition hover:bg-red-200"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 

@@ -4,14 +4,31 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Minus, Plus, Share2, ShoppingBag } from "lucide-react";
+
+import {
+  Heart,
+  HeartOff,
+  Minus,
+  Plus,
+  Share2,
+  Undo2,
+  ShoppingBag,
+  MessageCircle,
+  ShieldCheck,
+  Truck,
+  Check
+} from "lucide-react";
+
 import toast from "react-hot-toast";
+
 import { addToCart, getCartItemCount } from "@/src/lib/cart-api";
 import { isUserLoggedIn } from "@/src/lib/auth-keys";
 import { notifyCartUpdated } from "@/src/lib/cart-events";
 import { setCartItemCount } from "@/src/store/cartSlice";
 import { useDispatch } from "react-redux";
 import { API_BASE_URL } from "@/src/lib/userAxios";
+
+import { addToFavorites } from "@/src/lib/favorite-api";
 
 const BASE_URL = "https://maktab-shop.runflare.run";
 
@@ -36,8 +53,13 @@ export default function SingleProductPage({ productId }: Props) {
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState("");
   const [quantity, setQuantity] = useState(1);
+
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+
+  // FAVORITES
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -69,7 +91,7 @@ export default function SingleProductPage({ productId }: Props) {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center text-slate-500">
+      <div className="flex min-h-[70vh] items-center justify-center text-slate-500">
         در حال بارگذاری محصول...
       </div>
     );
@@ -77,7 +99,7 @@ export default function SingleProductPage({ productId }: Props) {
 
   if (!product) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center text-red-500">
+      <div className="flex min-h-[70vh] items-center justify-center text-red-500">
         محصول یافت نشد.
       </div>
     );
@@ -88,14 +110,15 @@ export default function SingleProductPage({ productId }: Props) {
       img.startsWith("http") ? img : `${BASE_URL}${img}`,
     ) || [];
 
+  // ADD TO CART
   const handleAddToCart = async () => {
     if (!product) return;
 
     if (!isUserLoggedIn()) {
       toast(
         (t) => (
-          <div className="flex flex-col gap-3 bg-linear-to-r from-orange-100 to-amber-100">
-            <span className="font-bold text-sm text-slate-800">
+          <div className="flex flex-col gap-3">
+            <span className="text-sm font-bold text-slate-800">
               برای افزودن به سبد خرید ابتدا وارد شوید
             </span>
 
@@ -112,6 +135,7 @@ export default function SingleProductPage({ productId }: Props) {
           duration: 5000,
         },
       );
+
       return;
     }
 
@@ -152,7 +176,7 @@ export default function SingleProductPage({ productId }: Props) {
               className="text-sm font-bold text-orange-500 underline"
               onClick={() => toast.dismiss(t.id)}
             >
-              رفتن به سبد خرید
+              برو به سبد خرید
             </a>
           </div>
         ),
@@ -167,82 +191,301 @@ export default function SingleProductPage({ productId }: Props) {
     }
   };
 
+  // FAVORITES
+  const handleAddToFavorite = async () => {
+    if (!product) return;
+
+    if (!isUserLoggedIn()) {
+      toast(
+        (t) => (
+          <div className="flex flex-col gap-3">
+            <span className="text-sm font-bold text-slate-800">
+              برای افزودن به علاقه‌مندی‌ها ابتدا وارد شوید
+            </span>
+
+            <a
+              href="/auth"
+              className="text-sm font-bold text-orange-500 underline"
+              onClick={() => toast.dismiss(t.id)}
+            >
+              رفتن به صفحه ورود
+            </a>
+          </div>
+        ),
+        {
+          duration: 5000,
+        },
+      );
+
+      return;
+    }
+
+    try {
+      setFavoriteLoading(true);
+
+      const res = await addToFavorites(product._id);
+
+      if (!res?.success) {
+        toast.error(res?.message || "خطا در افزودن");
+        return;
+      }
+
+      setIsFavorite(true);
+
+      toast.success(
+        (t) => (
+          <div className="flex flex-col gap-2">
+            <span className="text-sm">محصول به علاقه‌مندی‌ها اضافه شد</span>
+
+            <a
+              href="/favorites"
+              className="text-sm font-bold text-orange-500 underline"
+              onClick={() => toast.dismiss(t.id)}
+            >
+              مشاهده علاقه‌مندی‌ها
+            </a>
+          </div>
+        ),
+        {
+          duration: 4000,
+        },
+      );
+    } catch {
+      toast.error("خطا در افزودن به علاقه‌مندی‌ها");
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
+
   return (
-    <section dir="rtl" className="min-h-screen bg-slate-50 py-10 mt-30">
+    <section dir="rtl" className="min-h-screen bg-slate-50 pb-20 pt-32">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
-        <div className="grid gap-10 lg:grid-cols-2">
-          {/* ✅ FIXED RESPONSIVE IMAGE */}
-          <div className="relative w-full aspect-square sm:aspect-[4/4] lg:aspect-square min-h-[320px] overflow-hidden rounded-3xl bg-white shadow-xl">
-            <Image
-              src={selectedImage || images[0] || "/placeholder.png"}
-              alt={product.name}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-contain p-4 sm:p-6"
-              priority
-            />
+        {/* TOP */}
+        <div className="grid gap-12 lg:grid-cols-2">
+          {/* IMAGES */}
+          <div className="space-y-5">
+            <div className="relative aspect-square overflow-hidden rounded-[32px] bg-white shadow-xl">
+              {product.stock === 0 && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50 backdrop-blur-[2px]">
+                  <span className="rounded-2xl bg-red-500 px-6 py-3 text-lg font-black text-white shadow-xl">
+                    ناموجود
+                  </span>
+                </div>
+              )}
+
+              <Image
+                src={selectedImage || images[0] || "/placeholder.png"}
+                alt={product.name}
+                fill
+                priority
+                className={`object-contain p-6 transition duration-500 ${
+                  product.stock === 0 ? "opacity-50 grayscale" : ""
+                }`}
+              />
+            </div>
+
+            {/* THUMBNAILS */}
+            {images.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {images.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(img)}
+                    className={`relative h-24 w-24 overflow-hidden rounded-2xl border-2 transition ${
+                      selectedImage === img
+                        ? "border-orange-500"
+                        : "border-transparent"
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`thumb-${index}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* INFO */}
           <div>
-            <h1 className="text-4xl font-black">{product.name}</h1>
-
-            <div className="mt-3">
-              <span
-                className={`text-sm font-bold ${
-                  product.stock > 0 ? "text-green-600" : "text-red-500"
-                }`}
-              >
-                {product.stock > 0 ? `موجودی: ${product.stock}` : "ناموجود"}
+            <div className="mb-4 flex flex-wrap items-center gap-3">
+              <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-600">
+                {product.category}
               </span>
+
+              {product.stock > 0 ? (
+                <span className="flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-600">
+                  <Check size={16} />
+                  موجود در انبار
+                </span>
+              ) : (
+                <span className="rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-red-500">
+                  ناموجود
+                </span>
+              )}
             </div>
 
-            <div className="mt-6 text-3xl font-black text-orange-500">
-              {product.price.toLocaleString("fa-IR")} تومان
+            <h1 className="text-4xl leading-[70px] font-black text-slate-900">
+              {product.name}
+            </h1>
+
+            <div className="mt-8 rounded-3xl bg-white p-6 shadow-sm">
+              <div className="flex items-end gap-2">
+                <span className="text-5xl font-black text-orange-500">
+                  {product.price.toLocaleString("fa-IR")}
+                </span>
+
+                <span className="pb-2 text-lg text-slate-500">تومان</span>
+              </div>
+
+              <div className="mt-6 h-px bg-slate-100" />
+
+              <div className="mt-6 flex items-center gap-4">
+                {/* QUANTITY */}
+                <div className="flex items-center rounded-2xl border border-slate-200 bg-slate-50 p-2">
+                  <button
+                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm transition hover:bg-orange-50"
+                  >
+                    <Minus size={18} />
+                  </button>
+
+                  <span className="w-14 text-center text-lg font-black">
+                    {quantity}
+                  </span>
+
+                  <button
+                    onClick={() => setQuantity((prev) => prev + 1)}
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm transition hover:bg-orange-50"
+                  >
+                    <Plus size={18} />
+                  </button>
+                </div>
+
+                {/* ADD TO CART */}
+                <button
+                  onClick={handleAddToCart}
+                  disabled={adding || product.stock === 0}
+                  className="flex h-14 flex-1 items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 font-bold text-white shadow-lg shadow-orange-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <ShoppingBag size={20} />
+
+                  {adding ? "در حال افزودن..." : "افزودن به سبد خرید"}
+                </button>
+              </div>
+
+              {/* ACTIONS */}
+              <div className="mt-5 flex items-center gap-3">
+                {/* FAVORITE BUTTON */}
+                <button
+                  onClick={handleAddToFavorite}
+                  disabled={favoriteLoading}
+                  className={`group flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-300 ${
+                    isFavorite
+                      ? "border-red-200 bg-red-50 text-red-500"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-red-200 hover:bg-red-50 hover:text-red-500"
+                  }`}
+                >
+                  {isFavorite ? (
+                    <Heart className="fill-red-500 text-red-500" />
+                  ) : (
+                    <HeartOff />
+                  )}
+                </button>
+
+                {/* SHARE */}
+                <button className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-500">
+                  <Share2 />
+                </button>
+              </div>
             </div>
 
-            <p className="mt-6 text-slate-600 leading-8">
-              {product.description}
-            </p>
+            {/* DESCRIPTION */}
+            <div className="mt-8 rounded-3xl bg-white p-8 shadow-sm">
+              <h2 className="text-2xl font-black text-slate-900">
+                توضیحات محصول
+              </h2>
 
-            {/* QUANTITY */}
-            <div className="mt-8 flex items-center gap-4">
-              <button
-                onClick={() => setQuantity((p) => Math.max(1, p - 1))}
-                className="h-10 w-10 rounded-xl text-white flex items-center justify-center bg-gradient-to-r from-orange-500 to-amber-400"
-              >
-                <Minus size={18} />
-              </button>
-
-              <span className="w-10 text-center font-bold">{quantity}</span>
-
-              <button
-                onClick={() => setQuantity((p) => p + 1)}
-                className="h-10 w-10 rounded-xl text-white flex items-center justify-center bg-gradient-to-r from-orange-500 to-amber-400"
-              >
-                <Plus size={18} />
-              </button>
+              <p className="mt-5 leading-9 text-slate-600">
+                {product.description || "توضیحاتی برای این محصول ثبت نشده است."}
+              </p>
             </div>
 
-            {/* ADD TO CART */}
-            <button
-              onClick={handleAddToCart}
-              disabled={adding || product.stock === 0}
-              className="mt-10 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 font-bold text-white disabled:opacity-50"
-            >
-              <ShoppingBag />
-              {adding ? "در حال افزودن..." : "افزودن به سبد خرید"}
-            </button>
+            {/* FEATURES */}
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-3xl bg-white p-5 shadow-sm">
+                <Truck className="text-orange-500" />
 
-            <div className="mt-6 flex gap-4">
-              <button className="rounded-xl border p-3">
-                <Heart />
-              </button>
-              <button className="rounded-xl border p-3">
-                <Share2 />
-              </button>
+                <h3 className="mt-4 font-black text-slate-800">ارسال سریع</h3>
+
+                <p className="mt-2 text-sm leading-7 text-slate-500">
+                  ارسال به سراسر کشور در کوتاه‌ترین زمان
+                </p>
+              </div>
+
+              <div className="rounded-3xl bg-white p-5 shadow-sm">
+                <ShieldCheck className="text-orange-500" />
+
+                <h3 className="mt-4 font-black text-slate-800">ضمانت کیفیت</h3>
+
+                <p className="mt-2 text-sm leading-7 text-slate-500">
+                  تضمین کیفیت و اصالت تمامی محصولات
+                </p>
+              </div>
+
+              <div className="rounded-3xl bg-white p-5 shadow-sm">
+                <Undo2 className="text-orange-500" />
+
+                <h3 className="mt-4 font-black text-slate-800">بازگشت کالا</h3>
+
+                <p className="mt-2 text-sm leading-7 text-slate-500">
+                  امکان بازگشت کالا تا ۷ روز
+                </p>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* COMMENTS */}
+        <div className="mt-16 rounded-[32px] bg-white p-8 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-black text-slate-900">
+                نظرات کاربران
+              </h2>
+
+              <p className="mt-2 text-slate-500">
+                هنوز نظری برای این محصول ثبت نشده است
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-10 rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-16 text-center">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-orange-100">
+              <MessageCircle className="text-orange-500" size={32} />
+            </div>
+
+            <h3 className="mt-6 text-2xl font-black text-slate-800">
+              هنوز نظری ثبت نشده
+            </h3>
+
+            <p className="mt-3 text-slate-500">
+              اولین نفری باشید که برای این محصول نظر می‌دهد
+            </p>
+          </div>
+        </div>
+
+        {/* BACK TO PRODUCTS */}
+        <div className="mt-12 flex justify-center">
+          <Link
+            href="/products"
+            className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-bold text-slate-700 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-500"
+          >
+            بازگشت به محصولات
+          </Link>
         </div>
       </div>
     </section>
