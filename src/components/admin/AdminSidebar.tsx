@@ -57,12 +57,12 @@ export default function AdminSidebar() {
   ];
 
   return (
-    <aside className="flex h-screen w-20 flex-col border-l border-slate-800 bg-slate-950 text-white transition-all duration-300 lg:w-72 shrink-0 z-50">
+    <aside className="flex h-dvh w-20 flex-col border-l border-slate-800 bg-slate-950 text-white transition-all duration-300 lg:w-72 shrink-0 z-50 overflow-x-hidden">
       {/* Header */}
-      <div className="border-b border-slate-800 p-4 lg:p-6 flex justify-center lg:justify-start">
-        <div className="flex items-center gap-4 rounded-3xl lg:bg-linear-to-br lg:from-orange-500 lg:to-amber-400 p-2 lg:p-4 lg:shadow-xl lg:shadow-orange-500/20">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-500 lg:bg-white/20 lg:backdrop-blur-xl text-white">
-            <ShoppingBag size={24} />
+      <div className="border-b border-slate-800 p-2 lg:p-6 flex justify-center lg:justify-start">
+        <div className="flex items-center gap-4 rounded-3xl lg:bg-linear-to-br lg:from-orange-500 lg:to-amber-400 p-1 lg:p-4 lg:shadow-xl lg:shadow-orange-500/20">
+          <div className="flex h-10 w-10 lg:h-12 lg:w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-500 lg:bg-white/20 lg:backdrop-blur-xl text-white">
+            <ShoppingBag size={22} className="lg:w-6 lg:h-6" />
           </div>
 
           <div className="hidden lg:block">
@@ -73,7 +73,7 @@ export default function AdminSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2 py-6 lg:px-4 overflow-x-hidden">
+      <nav className="flex-1 overflow-y-auto px-2 py-6 lg:px-4 overflow-x-hidden custom-scrollbar">
         <div className="mb-4 hidden px-3 text-xs font-bold tracking-wider text-slate-500 lg:block">
           منوی مدیریت
         </div>
@@ -87,7 +87,7 @@ export default function AdminSidebar() {
                 <Link
                   href={item.href}
                   title={item.name}
-                  className={`group flex items-center justify-center rounded-2xl p-3 transition-all duration-200 lg:justify-between lg:px-4 py-3 ${
+                  className={`group flex items-center justify-center rounded-2xl p-2 lg:p-3 transition-all duration-200 lg:justify-between lg:px-4 ${
                     isActive
                       ? "bg-linear-to-r from-orange-500 to-amber-400 text-white shadow-lg shadow-orange-500/20"
                       : "text-slate-300 hover:bg-slate-900 hover:text-white"
@@ -121,11 +121,11 @@ export default function AdminSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="space-y-3 border-t border-slate-800 p-3 lg:p-4">
+      <div className="space-y-3 border-t border-slate-800 p-2 lg:p-4">
         <Link
           href="/"
           title="ورود به سایت"
-          className="flex items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-900 p-3 text-sm transition hover:border-orange-500 hover:bg-orange-500 hover:text-white lg:px-4 lg:py-3"
+          className="flex items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-900 p-2 lg:p-3 text-sm transition hover:border-orange-500 hover:bg-orange-500 hover:text-white lg:px-4"
         >
           <Globe size={20} className="shrink-0" />
           <span className="hidden lg:inline whitespace-nowrap">
@@ -139,7 +139,7 @@ export default function AdminSidebar() {
             router.push("/login-admin");
           }}
           title="خروج از حساب"
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-500/10 p-3 text-red-400 transition hover:bg-red-500 hover:text-white lg:px-4 lg:py-3"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-500/10 p-2 lg:p-3 text-red-400 transition hover:bg-red-500 hover:text-white lg:px-4"
         >
           <LogOut size={20} className="shrink-0" />
           <span className="hidden lg:inline whitespace-nowrap">
