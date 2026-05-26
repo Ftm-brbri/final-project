@@ -112,6 +112,7 @@ export default function Cart() {
 
   const handleRemove = async (productId: string) => {
     try {
+      console.log(cart)
       setUpdatingId(productId);
 
       const res = await removeFromCart(productId);
@@ -253,7 +254,7 @@ export default function Cart() {
                         </div>
 
                         <button
-                          onClick={() => handleRemove(item.product._id)}
+                          onClick={() => handleRemove(item._id)}
                           disabled={isUpdating}
                         >
                           <Trash2 />
