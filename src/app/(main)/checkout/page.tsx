@@ -13,6 +13,9 @@ import {
 
 import toast from "react-hot-toast";
 
+import { saveCheckoutOrder } from "@/src/lib/checkout-storage";
+import { getStoredUserProfile } from "@/src/lib/user-api";
+
 const SHIPPING_PRICE = 35000;
 
 const cartItemsMock = [
@@ -77,6 +80,19 @@ export default function CheckoutPage() {
   const handleContinuePayment = async () => {
     try {
       setLoading(true);
+
+      const profile = getStoredUserProfile();
+
+      saveCheckoutOrder({
+        shippingAddress: {
+          name: profile?.name ?? "کاربر",
+          phone: "+9949025858",
+          address:
+            profile?.address ??
+            "تهران، خیابان ولیعصر، پلاک ۱۲۳، واحد ۴",
+        },
+        paymentMethod: selectedPayment,
+      });
 
       localStorage.setItem("checkout_total", JSON.stringify(finalPrice));
 

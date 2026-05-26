@@ -196,10 +196,10 @@ export default function PaymentGatewayPage() {
               </label>
 
               <input
+                type="number"
                 value={cvv2}
                 onChange={(e) => setCvv2(e.target.value)}
                 placeholder="CVV2"
-                maxLength={4}
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none focus:border-[#1d63d8]"
               />
             </div>
