@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Pagination from "@/src/shared/components/pagination";
+import toast from "react-hot-toast";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
 const IMAGE_BASE_URL = "https://maktab-shop.runflare.run";
@@ -110,7 +111,7 @@ export default function QuantityPage() {
       const changedProducts = Object.entries(editedValues);
 
       if (changedProducts.length === 0) {
-        alert("تغییری انجام نشده");
+        toast("تغییری انجام نشده");
         return;
       }
 
@@ -150,10 +151,10 @@ export default function QuantityPage() {
       setEditedValues({});
       setEditingCell(null);
 
-      alert("همه تغییرات ذخیره شدند");
+      toast("همه تغییرات ذخیره شدند");
     } catch (error) {
       console.error("Save failed:", error);
-      alert("خطا در ذخیره تغییرات");
+      toast("خطا در ذخیره تغییرات");
     } finally {
       setSaving(false);
     }
@@ -275,7 +276,7 @@ export default function QuantityPage() {
                         onBlur={() => setEditingCell(null)}
                         className={`w-[140px] rounded-xl border p-2 outline-none transition ${
                           isPriceChanged
-                            ? "border-orange-400 bg-orange-50 ring-2 ring-orange-200"
+                            ? "border-orange-700 bg-orange-50 ring-2 ring-orange-200"
                             : "border-slate-200"
                         }`}
                       />
@@ -283,7 +284,7 @@ export default function QuantityPage() {
                       <span
                         className={`inline-flex rounded-xl px-3 py-2 font-semibold transition ${
                           isPriceChanged
-                            ? "bg-orange-100 text-orange-700 ring-2 ring-orange-200"
+                            ? "bg-orange-300 text-orange-700 ring-2 ring-orange-200"
                             : "bg-orange-50 text-orange-700 hover:bg-orange-100"
                         }`}
                       >

@@ -117,7 +117,7 @@ export function MostSaled() {
 
         const res = await axios.get(`${API_URL}/products`, {
           params: {
-            limit: 20,
+            limit: 6,
           },
         });
 

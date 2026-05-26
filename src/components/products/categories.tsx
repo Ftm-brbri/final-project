@@ -63,7 +63,7 @@ function CategoryCard({
     <div
       onClick={onClick}
       className={`group relative overflow-hidden rounded-[28px] cursor-pointer ${
-        item.large ? "min-h-155" : "min-h-75"
+        item.large ? "min-h-[620px]" : "min-h-[300px]"
       }`}
     >
       {/* Image */}
@@ -119,9 +119,9 @@ function Category() {
       {/* Background */}
       <div className="absolute inset-0 bg-slate-100" />
 
-      <div className="absolute top-0 left-0 h-75 w-75 rounded-full bg-orange-500/10 blur-[120px]" />
+      <div className="absolute top-0 left-0 h-[300px] w-[300px] rounded-full bg-orange-500/10 blur-[120px]" />
 
-      <div className="absolute bottom-0 right-0 h-62.5 w-62.5 rounded-full bg-amber-400/10 blur-[100px]" />
+      <div className="absolute bottom-0 right-0 h-[250px] w-[250px] rounded-full bg-amber-400/10 blur-[100px]" />
 
       <div className="relative mx-auto max-w-7xl px-4 md:px-8">
         {/* Header */}

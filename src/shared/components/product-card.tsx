@@ -49,10 +49,10 @@ export default function ProductCard({ product }: Props) {
       {/* IMAGE */}
       <div className="relative overflow-hidden">
         {/* BADGE */}
-        <div className="absolute right-4 top-4 z-10 flex items-center gap-1 rounded-full bg-orange-500 px-3 py-1 text-xs font-bold text-white shadow-lg shadow-orange-500/30">
+        {/* <div className="absolute right-4 top-4 z-10 flex items-center gap-1 rounded-full bg-orange-500 px-3 py-1 text-xs font-bold text-white shadow-lg shadow-orange-500/30">
           <Flame size={13} />
           پرفروش
-        </div>
+        </div> */}
 
         {/* FAVORITE ICON */}
         <button

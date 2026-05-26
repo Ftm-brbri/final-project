@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import Pagination from "@/src/shared/components/pagination";
 
@@ -17,12 +17,14 @@ const getImageSrc = (image: string) => {
   if (image.startsWith("http")) {
     return image;
   }
+
   return `${BASE_URL}${image}`;
 };
 
 type Product = {
   _id: string;
   name: string;
+  description?: string;
   price: number;
   stock: number;
   category: string;
@@ -32,84 +34,128 @@ type Product = {
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const [loading, setLoading] = useState(true);
+  const [modalLoading, setModalLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const [editForm, setEditForm] = useState({
     name: "",
+    description: "",
     price: "",
     stock: "",
     category: "",
+    images: [] as string[],
   });
 
   const [newImages, setNewImages] = useState<FileList | null>(null);
 
-  const getProducts = async () => {
-    try {
-      setLoading(true);
+  useEffect(() => {
+    let ignore = false;
 
-      const res = await axios.get(`${API_URL}/products`, {
-        params: {
-          page: 1,
-          limit: 100,
-        },
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/products`, {
+          params: {
+            page: 1,
+            limit: 100,
+          },
+        });
+
+        const productsData =
+          res.data?.data?.products ||
+          res.data?.data?.items ||
+          res.data?.data ||
+          res.data?.products ||
+          res.data ||
+          [];
+
+        if (!ignore) {
+          setProducts(Array.isArray(productsData) ? productsData : []);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+
+        if (!ignore) {
+          setProducts([]);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchProducts();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  // OPEN EDIT MODAL
+  const openEditModal = async (productId: string) => {
+    try {
+      setModalLoading(true);
+      setShowEditModal(true);
+
+      const res = await axios.get(`${API_URL}/products/${productId}`);
+
+      const product = res.data?.data || res.data?.product || res.data;
+
+      setSelectedProduct(product);
+
+      setEditForm({
+        name: product.name || "",
+        description: product.description || "",
+        price: product.price?.toString() || "",
+        stock: product.stock?.toString() || "",
+        category: product.category || "",
+        images: product.images || [],
       });
 
-      const productsData =
-        res.data?.data?.products ||
-        res.data?.data?.items ||
-        res.data?.data ||
-        res.data?.products ||
-        res.data ||
-        [];
-
-      setProducts(Array.isArray(productsData) ? productsData : []);
+      setNewImages(null);
     } catch (error) {
-      console.error("Error fetching products:", error);
-      setProducts([]);
+      console.error(error);
+      alert("خطا در دریافت اطلاعات محصول");
+      setShowEditModal(false);
     } finally {
-      setLoading(false);
+      setModalLoading(false);
     }
   };
 
-  //EDIT MODAL
-  const openEditModal = (product: Product) => {
-    setSelectedProduct(product);
-
-    setEditForm({
-      name: product.name || "",
-      price: product.price?.toString() || "",
-      stock: product.stock?.toString() || "",
-      category: product.category || "",
-    });
-
-    setNewImages(null);
-    setShowEditModal(true);
+  // DELETE IMAGE
+  const handleRemoveImage = (image: string) => {
+    setEditForm((prev) => ({
+      ...prev,
+      images: prev.images.filter((img) => img !== image),
+    }));
   };
 
-  //DELETE MODAL
-  const openDeleteModal = (product: Product) => {
-    setSelectedProduct(product);
-    setShowDeleteModal(true);
-  };
-
+  // CLOSE MODAL
   const closeEditModal = () => {
     setShowEditModal(false);
+
     setSelectedProduct(null);
 
     setEditForm({
       name: "",
+      description: "",
       price: "",
       stock: "",
       category: "",
+      images: [],
     });
 
     setNewImages(null);
   };
 
+  // UPDATE PRODUCT
   const updateProduct = async () => {
     if (!selectedProduct) return;
 
@@ -117,26 +163,21 @@ export default function ProductsPage() {
       setUpdating(true);
 
       const token = localStorage.getItem("admin_token");
+
       const formData = new FormData();
 
-      //changed fields
-      if (editForm.name !== selectedProduct.name) {
-        formData.append("name", editForm.name);
-      }
+      formData.append("name", editForm.name);
+      formData.append("description", editForm.description);
+      formData.append("price", editForm.price);
+      formData.append("stock", editForm.stock);
+      formData.append("category", editForm.category);
 
-      if (Number(editForm.price) !== selectedProduct.price) {
-        formData.append("price", editForm.price);
-      }
+      // KEEP REMAINING IMAGES
+      editForm.images.forEach((img) => {
+        formData.append("existingImages", img);
+      });
 
-      if (Number(editForm.stock) !== selectedProduct.stock) {
-        formData.append("stock", editForm.stock);
-      }
-
-      if (editForm.category !== selectedProduct.category) {
-        formData.append("category", editForm.category);
-      }
-
-      //new images
+      // NEW IMAGES
       if (newImages && newImages.length > 0) {
         Array.from(newImages).forEach((file) => {
           formData.append("images", file);
@@ -156,25 +197,28 @@ export default function ProductsPage() {
 
       const updatedProduct = res.data?.data || res.data?.product || res.data;
 
-      // update UI
+      // UPDATE UI
       setProducts((prev) =>
         prev.map((product) =>
-          product._id === selectedProduct._id
-            ? {
-                ...product,
-                ...updatedProduct,
-              }
-            : product,
+          product._id === selectedProduct._id ? updatedProduct : product,
         ),
       );
 
       closeEditModal();
+
+      alert("محصول با موفقیت ویرایش شد");
     } catch (error) {
-      console.error("Update failed:", error);
+      console.error(error);
       alert("خطا در ویرایش محصول");
     } finally {
       setUpdating(false);
     }
+  };
+
+  // DELETE PRODUCT
+  const openDeleteModal = (product: Product) => {
+    setSelectedProduct(product);
+    setShowDeleteModal(true);
   };
 
   const deleteProduct = async () => {
@@ -189,55 +233,25 @@ export default function ProductsPage() {
         },
       });
 
-      // remove from UI
-      setProducts((prev) =>
-        prev.filter((product) => product._id !== selectedProduct._id),
-      );
+      setProducts((prev) => prev.filter((p) => p._id !== selectedProduct._id));
 
       setShowDeleteModal(false);
       setSelectedProduct(null);
 
       if (paginatedProducts.length === 1 && currentPage > 1) {
-        setCurrentPage(currentPage - 1);
+        setCurrentPage((prev) => prev - 1);
       }
     } catch (error) {
-      console.error("Delete failed:", error);
+      console.error(error);
       alert("خطا در حذف محصول");
     }
   };
-  // INITIAL FETCH
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/products`, {
-          params: {
-            page: 1,
-            limit: 100,
-          },
-        });
 
-        const productsData =
-          res.data?.data?.products ||
-          res.data?.data?.items ||
-          res.data?.data ||
-          res.data?.products ||
-          res.data ||
-          [];
-
-        setProducts(Array.isArray(productsData) ? productsData : []);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
+  // PAGINATION
   const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+
   const paginatedProducts = products.slice(
     startIndex,
     startIndex + ITEMS_PER_PAGE,
@@ -253,6 +267,7 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-6" dir="rtl">
+      {/* HEADER */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-slate-800">لیست محصولات</h1>
 
@@ -264,13 +279,14 @@ export default function ProductsPage() {
         </Link>
       </div>
 
+      {/* TABLE */}
       <div className="overflow-x-auto rounded-2xl border bg-white shadow">
         <table className="w-full text-sm">
           <thead className="bg-slate-900 text-white">
             <tr>
               <th className="p-3">ردیف</th>
               <th className="p-3">عکس</th>
-              <th className="p-3">نام محصول</th>
+              <th className="p-3">نام</th>
               <th className="p-3">قیمت</th>
               <th className="p-3">موجودی</th>
               <th className="p-3">دسته‌بندی</th>
@@ -279,127 +295,62 @@ export default function ProductsPage() {
           </thead>
 
           <tbody>
-            {paginatedProducts.map((p, index) => {
-              const isOutOfStock = p.stock === 0;
+            {paginatedProducts.map((p, index) => (
+              <tr key={p._id} className="border-b transition hover:bg-slate-50">
+                <td className="p-3 text-center">{startIndex + index + 1}</td>
 
-              return (
-                <tr
-                  key={p._id}
-                  className={`border-b transition ${
-                    isOutOfStock
-                      ? "bg-slate-100/80 opacity-70"
-                      : "hover:bg-slate-50"
-                  }`}
-                >
-                  {/* INDEX */}
-                  <td className="p-3 text-center">{startIndex + index + 1}</td>
-
-                  {/* IMAGE */}
-                  <td className="p-3">
-                    <div className="relative h-14 w-14 overflow-hidden rounded-xl bg-slate-100">
-                      {p.images.length ? (
-                        <>
-                          <Image
-                            src={getImageSrc(p.images[0])}
-                            alt={p.name}
-                            width={60}
-                            height={60}
-                            className={`h-full w-full object-cover ${
-                              isOutOfStock ? "grayscale" : ""
-                            }`}
-                          />
-
-                          {isOutOfStock && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                              <span className="rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">
-                                ناموجود
-                              </span>
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-xs text-slate-400">
-                          no img
-                        </div>
-                      )}
-                    </div>
-                  </td>
-
-                  {/* NAME */}
-                  <td
-                    className={`p-3 font-semibold ${
-                      isOutOfStock
-                        ? "text-slate-400 line-through"
-                        : "text-slate-700"
-                    }`}
-                  >
-                    {p.name}
-                  </td>
-
-                  {/* PRICE */}
-                  <td
-                    className={`p-3 ${
-                      isOutOfStock ? "text-slate-400" : "text-slate-700"
-                    }`}
-                  >
-                    {p.price?.toLocaleString()} تومان
-                  </td>
-
-                  {/* STOCK */}
-                  <td className="p-3">
-                    {isOutOfStock ? (
-                      <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-600">
-                        ناموجود
-                      </span>
+                <td className="p-3">
+                  <div className="h-14 w-14 overflow-hidden rounded-xl bg-slate-100">
+                    {p.images?.length > 0 ? (
+                      <Image
+                        src={getImageSrc(p.images[0])}
+                        alt={p.name}
+                        width={60}
+                        height={60}
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
-                      <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-600">
-                        {p.stock} عدد
-                      </span>
+                      <div className="flex h-full items-center justify-center text-xs text-slate-400">
+                        no img
+                      </div>
                     )}
-                  </td>
+                  </div>
+                </td>
 
-                  {/* CATEGORY */}
-                  <td
-                    className={`p-3 ${
-                      isOutOfStock ? "text-slate-400" : "text-slate-700"
-                    }`}
-                  >
-                    {p.category}
-                  </td>
+                <td className="p-3 font-semibold text-slate-700">{p.name}</td>
 
-                  {/* ACTIONS */}
-                  <td className="p-3">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => openEditModal(p)}
-                        className="rounded-lg bg-blue-100 p-2 text-blue-600 transition hover:bg-blue-200"
-                      >
-                        <Pencil size={16} />
-                      </button>
+                <td className="p-3">{p.price.toLocaleString()} تومان</td>
 
-                      <button
-                        onClick={() => openDeleteModal(p)}
-                        className="rounded-lg bg-red-100 p-2 text-red-600 transition hover:bg-red-200"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+                <td className="p-3">{p.stock}</td>
+
+                <td className="p-3">{p.category}</td>
+
+                <td className="p-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => openEditModal(p._id)}
+                      className="rounded-lg bg-blue-100 p-2 text-blue-600 transition hover:bg-blue-200"
+                    >
+                      <Pencil size={16} />
+                    </button>
+
+                    <button
+                      onClick={() => openDeleteModal(p)}
+                      className="rounded-lg bg-red-100 p-2 text-red-600 transition hover:bg-red-200"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
-
-        {products.length === 0 && (
-          <div className="py-10 text-center text-slate-500">
-            محصولی یافت نشد
-          </div>
-        )}
       </div>
 
+      {/* PAGINATION */}
       {totalPages > 1 && (
-        <div className="mt-6 flex justify-center pb-4">
+        <div className="flex justify-center">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -409,126 +360,160 @@ export default function ProductsPage() {
       )}
 
       {/* EDIT MODAL */}
-      {showEditModal && selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="relative w-125 rounded-2xl bg-white p-6 shadow-xl">
-            <button
-              onClick={closeEditModal}
-              className="absolute left-3 top-3 text-slate-400 hover:text-slate-700"
-            >
-              ✕
-            </button>
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl">
+            {modalLoading ? (
+              <div className="py-20 text-center text-slate-500">
+                در حال دریافت اطلاعات محصول...
+              </div>
+            ) : (
+              <>
+                {/* HEADER */}
+                <div className="mb-8 flex items-center justify-between">
+                  <h2 className="text-2xl font-black text-slate-800">
+                    ویرایش محصول
+                  </h2>
 
-            <h2 className="mb-6 text-xl font-bold text-slate-800">
-              ویرایش محصول
-            </h2>
+                  <button
+                    onClick={closeEditModal}
+                    className="rounded-full p-2 transition hover:bg-slate-100"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
 
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="نام محصول"
-                value={editForm.name}
-                onChange={(e) =>
-                  setEditForm((prev) => ({
-                    ...prev,
-                    name: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border p-3 outline-none focus:border-slate-500"
-              />
+                {/* FORM */}
+                <div className="space-y-5">
+                  <input
+                    type="text"
+                    placeholder="نام محصول"
+                    value={editForm.name}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
+                    className="w-full rounded-2xl border p-4 outline-none focus:border-orange-500"
+                  />
 
-              <input
-                type="number"
-                placeholder="قیمت"
-                value={editForm.price}
-                onChange={(e) =>
-                  setEditForm((prev) => ({
-                    ...prev,
-                    price: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border p-3 outline-none focus:border-slate-500"
-              />
+                  <textarea
+                    placeholder="توضیحات محصول"
+                    value={editForm.description}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                    rows={5}
+                    className="w-full rounded-2xl border p-4 outline-none focus:border-orange-500"
+                  />
 
-              <input
-                type="number"
-                placeholder="موجودی"
-                value={editForm.stock}
-                onChange={(e) =>
-                  setEditForm((prev) => ({
-                    ...prev,
-                    stock: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border p-3 outline-none focus:border-slate-500"
-              />
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <input
+                      type="number"
+                      placeholder="قیمت"
+                      value={editForm.price}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          price: e.target.value,
+                        }))
+                      }
+                      className="w-full rounded-2xl border p-4 outline-none focus:border-orange-500"
+                    />
 
-              <input //select option
-                type="text"
-                placeholder="دسته بندی"
-                value={editForm.category}
-                onChange={(e) =>
-                  setEditForm((prev) => ({
-                    ...prev,
-                    category: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border p-3 outline-none focus:border-slate-500"
-              />
+                    <input
+                      type="number"
+                      placeholder="موجودی"
+                      value={editForm.stock}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          stock: e.target.value,
+                        }))
+                      }
+                      className="w-full rounded-2xl border p-4 outline-none focus:border-orange-500"
+                    />
+                  </div>
 
-              {selectedProduct.images?.length > 0 && (
-                <div>
-                  <p className="mb-2 text-sm text-slate-600">تصویر فعلی</p>
+                  <input
+                    type="text"
+                    placeholder="دسته‌بندی"
+                    value={editForm.category}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        category: e.target.value,
+                      }))
+                    }
+                    className="w-full rounded-2xl border p-4 outline-none focus:border-orange-500"
+                  />
 
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProduct.images.map((img, i) => (
-                      <div
-                        key={i}
-                        className="overflow-hidden rounded-lg border"
-                      >
-                        <Image
-                          src={getImageSrc(img)}
-                          alt={`product-${i}`}
-                          width={70}
-                          height={70}
-                          className="h-[70px] w-[70px] object-cover"
-                        />
-                      </div>
-                    ))}
+                  {/* IMAGES */}
+                  <div>
+                    <p className="mb-4 font-bold text-slate-700">
+                      تصاویر محصول
+                    </p>
+
+                    <div className="flex flex-wrap gap-4">
+                      {editForm.images.map((img, index) => (
+                        <div key={index} className="relative">
+                          <Image
+                            src={getImageSrc(img)}
+                            alt={`product-${index}`}
+                            width={100}
+                            height={100}
+                            className="h-[100px] w-[100px] rounded-2xl object-cover"
+                          />
+
+                          <button
+                            onClick={() => handleRemoveImage(img)}
+                            className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white shadow-lg"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* NEW IMAGES */}
+                  <div>
+                    <label className="mb-2 block font-medium text-slate-700">
+                      افزودن تصاویر جدید
+                    </label>
+
+                    <input
+                      type="file"
+                      multiple
+                      onChange={(e) => setNewImages(e.target.files)}
+                      className="w-full rounded-xl border p-3"
+                    />
+                  </div>
+
+                  {/* ACTIONS */}
+                  <div className="flex gap-4 pt-4">
+                    <button
+                      onClick={closeEditModal}
+                      className="flex-1 rounded-2xl border py-4 font-bold transition hover:bg-slate-100"
+                    >
+                      لغو
+                    </button>
+
+                    <button
+                      onClick={updateProduct}
+                      disabled={updating}
+                      className="flex-1 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 py-4 font-bold text-white shadow-lg transition hover:scale-[1.01] disabled:opacity-50"
+                    >
+                      {updating ? "در حال ذخیره..." : "ذخیره تغییرات"}
+                    </button>
                   </div>
                 </div>
-              )}
-
-              <div>
-                <label className="mb-2 block text-sm text-slate-600">
-                  افزودن تصاویر جدید
-                </label>
-
-                <input
-                  type="file"
-                  multiple
-                  onChange={(e) => setNewImages(e.target.files)}
-                  className="w-full"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={closeEditModal}
-                  className="flex-1 rounded-lg border border-slate-300 py-3 font-medium hover:bg-slate-50"
-                >
-                  لغو
-                </button>
-
-                <button
-                  onClick={updateProduct}
-                  disabled={updating}
-                  className="flex-1 rounded-lg bg-blue-600 py-3 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {updating ? "در حال ذخیره..." : "ذخیره تغییرات"}
-                </button>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -536,42 +521,31 @@ export default function ProductsPage() {
       {/* DELETE MODAL */}
       {showDeleteModal && selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="relative w-[400px] rounded-2xl bg-white p-6 shadow-xl">
-            <button
-              onClick={() => {
-                setShowDeleteModal(false);
-                setSelectedProduct(null);
-              }}
-              className="absolute left-3 top-3 text-slate-400 hover:text-slate-700"
-            >
-              ✕
-            </button>
+          <div className="w-[400px] rounded-3xl bg-white p-6 shadow-2xl">
+            <h2 className="text-xl font-black text-red-600">حذف محصول</h2>
 
-            {/* TITLE */}
-            <h2 className="text-xl font-bold text-red-600">حذف محصول</h2>
-
-            <p className="mt-3 text-slate-600">
+            <p className="mt-4 text-slate-600">
               آیا از حذف این محصول مطمئن هستید؟
             </p>
 
-            <p className="mt-2 font-semibold text-slate-800">
+            <p className="mt-2 font-bold text-slate-800">
               {selectedProduct.name}
             </p>
 
-            <div className="mt-6 flex gap-3">
+            <div className="mt-8 flex gap-3">
               <button
                 onClick={() => {
                   setShowDeleteModal(false);
                   setSelectedProduct(null);
                 }}
-                className="flex-1 rounded-lg border border-slate-300 py-2 font-medium hover:bg-slate-50"
+                className="flex-1 rounded-2xl border py-3 font-bold"
               >
                 لغو
               </button>
 
               <button
                 onClick={deleteProduct}
-                className="flex-1 rounded-lg bg-red-600 py-2 font-medium text-white hover:bg-red-700"
+                className="flex-1 rounded-2xl bg-red-500 py-3 font-bold text-white"
               >
                 حذف
               </button>
