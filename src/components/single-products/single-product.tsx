@@ -16,7 +16,7 @@ import {
   MessageCircle,
   ShieldCheck,
   Truck,
-  Check
+  Check,
 } from "lucide-react";
 
 import toast from "react-hot-toast";
@@ -264,7 +264,7 @@ export default function SingleProductPage({ productId }: Props) {
         <div className="grid gap-12 lg:grid-cols-2">
           {/* IMAGES */}
           <div className="space-y-5">
-            <div className="relative aspect-square overflow-hidden rounded-[32px] bg-white shadow-xl">
+            <div className="relative aspect-square overflow-hidden rounded-4xl bg-white shadow-xl">
               {product.stock === 0 && (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50 backdrop-blur-[2px]">
                   <span className="rounded-2xl bg-red-500 px-6 py-3 text-lg font-black text-white shadow-xl">
@@ -328,7 +328,7 @@ export default function SingleProductPage({ productId }: Props) {
               )}
             </div>
 
-            <h1 className="text-4xl leading-[70px] font-black text-slate-900">
+            <h1 className="text-4xl leading-17.5 font-black text-slate-900">
               {product.name}
             </h1>
 
@@ -358,8 +358,13 @@ export default function SingleProductPage({ productId }: Props) {
                   </span>
 
                   <button
-                    onClick={() => setQuantity((prev) => prev + 1)}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm transition hover:bg-orange-50"
+                    onClick={() =>
+                      setQuantity((prev) =>
+                        product ? Math.min(prev + 1, product.stock) : prev,
+                      )
+                    }
+                    disabled={quantity >= product.stock}
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-r from-orange-500 to-amber-400 text-white transition disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Plus size={18} />
                   </button>
@@ -369,7 +374,7 @@ export default function SingleProductPage({ productId }: Props) {
                 <button
                   onClick={handleAddToCart}
                   disabled={adding || product.stock === 0}
-                  className="flex h-14 flex-1 items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 font-bold text-white shadow-lg shadow-orange-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-14 flex-1 items-center justify-center gap-3 rounded-2xl bg-linear-to-r from-orange-500 to-amber-400 font-bold text-white shadow-lg shadow-orange-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <ShoppingBag size={20} />
 
@@ -450,7 +455,7 @@ export default function SingleProductPage({ productId }: Props) {
         </div>
 
         {/* COMMENTS */}
-        <div className="mt-16 rounded-[32px] bg-white p-8 shadow-sm">
+        <div className="mt-16 rounded-4xl bg-white p-8 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-black text-slate-900">

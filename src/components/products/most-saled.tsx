@@ -15,8 +15,8 @@ type Product = {
   _id: string;
   name: string;
   price: number;
-  category: string;
   stock: number;
+  category: string;
   images: string[];
 };
 
@@ -64,16 +64,12 @@ function ProductCard({ product }: { product: Product }) {
           {/* Stock */}
           <div
             className={`flex items-center gap-1 text-sm ${
-              product.stock > 0
-                ? "text-emerald-600"
-                : "text-red-500"
+              product.stock > 0 ? "text-emerald-600" : "text-red-500"
             }`}
           >
             <div
               className={`h-2 w-2 rounded-full ${
-                product.stock > 0
-                  ? "bg-emerald-500"
-                  : "bg-red-500"
+                product.stock > 0 ? "bg-emerald-500" : "bg-red-500"
               }`}
             />
 
@@ -89,18 +85,14 @@ function ProductCard({ product }: { product: Product }) {
         {/* Footer */}
         <div className="flex items-center justify-between border-t border-slate-100 pt-4">
           <div>
-            <p className="text-xs text-slate-400">
-              قیمت محصول
-            </p>
+            <p className="text-xs text-slate-400">قیمت محصول</p>
 
             <div className="mt-1 flex items-center gap-1">
               <span className="text-xl font-black text-slate-900">
                 {product.price?.toLocaleString("fa-IR")}
               </span>
 
-              <span className="text-sm text-slate-500">
-                تومان
-              </span>
+              <span className="text-sm text-slate-500">تومان</span>
             </div>
           </div>
 
@@ -136,11 +128,7 @@ export function MostSaled() {
           res.data ||
           [];
 
-        setProducts(
-          Array.isArray(productsData)
-            ? productsData
-            : [],
-        );
+        setProducts(Array.isArray(productsData) ? productsData : []);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
@@ -179,7 +167,6 @@ export function MostSaled() {
             className="group inline-flex items-center gap-2 self-start rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-white backdrop-blur-xl transition hover:border-orange-500 hover:bg-orange-500"
           >
             مشاهده همه محصولات
-
             <ArrowLeft
               size={18}
               className="transition group-hover:-translate-x-1"
@@ -196,9 +183,7 @@ export function MostSaled() {
 
         {/* Empty */}
         {!loading && products.length === 0 && (
-          <div className="py-20 text-center text-white">
-            محصولی یافت نشد.
-          </div>
+          <div className="py-20 text-center text-white">محصولی یافت نشد.</div>
         )}
 
         {/* Swiper */}
