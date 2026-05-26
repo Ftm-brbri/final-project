@@ -105,7 +105,7 @@ export default function ProductsPage() {
       setShowEditModal(true);
 
       const res = await axios.get(`${API_URL}/products/${productId}`);
-
+      console.log(res.data);
       const product = res.data?.data || res.data?.product || res.data;
 
       setSelectedProduct(product);
@@ -119,7 +119,7 @@ export default function ProductsPage() {
         images: product.images || [],
       });
 
-      setNewImages(null);
+      // setNewImages(null);
     } catch (error) {
       console.error(error);
       alert("خطا در دریافت اطلاعات محصول");
@@ -131,6 +131,7 @@ export default function ProductsPage() {
 
   // DELETE IMAGE
   const handleRemoveImage = (image: string) => {
+    console.log("image is: ",image);
     setEditForm((prev) => ({
       ...prev,
       images: prev.images.filter((img) => img !== image),
@@ -158,7 +159,8 @@ export default function ProductsPage() {
   // UPDATE PRODUCT
   const updateProduct = async () => {
     if (!selectedProduct) return;
-
+    console.log("editForm.images is: ",editForm.images);
+    // return;
     try {
       setUpdating(true);
 
@@ -174,7 +176,7 @@ export default function ProductsPage() {
 
       // KEEP REMAINING IMAGES
       editForm.images.forEach((img) => {
-        formData.append("existingImages", img);
+        formData.append("images", img);
       });
 
       // NEW IMAGES
@@ -183,7 +185,11 @@ export default function ProductsPage() {
           formData.append("images", file);
         });
       }
-
+      console.log("formData is: ",formData.entries());
+      for (const pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+      // return;
       const res = await axios.put(
         `${API_URL}/products/${selectedProduct._id}`,
         formData,
