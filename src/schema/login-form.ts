@@ -1,15 +1,14 @@
 import { z } from "zod";
+
 export const loginFormSchema = z.object({
-	userName: z
-		.string()
-		.nonempty("نام کاربری الزامی است")
-		.min(3, "نام کاربری باید حداقل سه حرف باشد"),
-	password: z
-		.string()
-		.min(8, "کلمه عبور باید حداقل 8 کاراکتر باشد")
-		.regex(
-			/[^a-zA-Z0-9]/,
-			"پسور باید شامل حداقل یک حرف بزرگ و کوچک و عدد و نماد باشد",
-		),
+  userName: z
+    .string()
+    .nonempty("ایمیل الزامی است")
+    .email("ایمیل معتبر نیست"),
+
+  password: z
+    .string()
+    .min(6, "کلمه عبور باید حداقل 6 کاراکتر باشد"),
 });
+
 export type LoginFormSchemaType = z.infer<typeof loginFormSchema>;

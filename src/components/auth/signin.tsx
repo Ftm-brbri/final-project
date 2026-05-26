@@ -31,31 +31,38 @@ function SignIn() {
     formState: { errors },
   } = useForm<LoginFormSchemaType>({ resolver: zodResolver(loginFormSchema) });
 
-  async function onSubmit(data: LoginFormSchemaType) {
+  async function onSubmit(user: LoginFormSchemaType) {
     try {
       setIsSubmitting(true);
 
       const { data: res } = await userAxios.post<LoginResponse>("/auth/login", {
-        email: data.userName.trim(),
-        password: data.password,
+        email: user.userName.trim(),
+        password: user.password,
       });
 
       if (!res?.success || !res.data) {
-        toast.error(res?.message || "خطا در ورود");
+        toast.error(res?.message || "نام کاربری یا کلمه عبور اشتباه است");
         return;
       }
 
-      saveUserSession(res.data);
+      await saveUserSession(res.data);
       toast.success(res.message || "ورود با موفقیت انجام شد");
       router.push("/profile");
-    } catch (err: unknown) {
-      let message = "نام کاربری یا کلمه عبور اشتباه است";
+    } catch (error) {
+      const err = error as Error & {
+        response?: { data?: { message?: string }; status?: number };
+      };
 
-      if (typeof err === "object" && err !== null && "response" in err) {
-        const errorResponse = err as {
-          response?: { data?: { message?: string } };
-        };
-        message = errorResponse.response?.data?.message || message;
+      if (err.message === "NEXT_REDIRECT") {
+        throw err;
+      }
+
+      let message = "خطایی در ارتباط با سرور رخ داد";
+
+      if (err.response?.data?.message) {
+        message = err.response.data.message;
+      } else if (err.response?.status === 401 || err.response?.status === 400) {
+        message = "نام کاربری یا کلمه عبور اشتباه است";
       }
 
       toast.error(message);

@@ -198,6 +198,9 @@ export default function OrderDetail({ orderId }: Props) {
                 </p>
                 <p className="leading-7">{order.shippingAddress.address}</p>
               </div>
+              <button onClick={() => router.push("/payment")}>
+                برو به پرداخت
+              </button>
             </div>
           </div>
         </div>

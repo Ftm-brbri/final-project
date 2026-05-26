@@ -1,17 +1,20 @@
 import { z } from "zod";
+
 export const signupFormSchema = z
   .object({
     userName: z
       .string()
-      .nonempty("نام کاربری الزامی است")
-      .min(3, "نام کاربری باید حداقل سه حرف باشد"),
+      .email("ایمیل معتبر نیست")
+      .nonempty("ایمیل الزامی است"),
+
     password: z
       .string()
       .min(8, "کلمه عبور باید حداقل 8 کاراکتر باشد")
       .regex(
-        /[^a-zA-Z0-9]/,
-        "پسور باید شامل حداقل یک حرف بزرگ و کوچک و عدد و نماد باشد",
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/,
+        "رمز عبور باید شامل حروف بزرگ، کوچک، عدد و نماد باشد",
       ),
+
     repeatPassword: z.string(),
   })
   .refine((data) => data.password === data.repeatPassword, {

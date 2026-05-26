@@ -55,17 +55,23 @@ function SignUp() {
         return;
       }
 
-      saveUserSession(res.data);
+      await saveUserSession(res.data);
       toast.success(res.message || "ثبت‌نام با موفقیت انجام شد");
       router.push("/profile");
-    } catch (err: unknown) {
-      let message = "خطا در ثبت‌نام";
+    } catch (error) {
+ 
+      const err = error as Error & {
+        response?: { data?: { message?: string }; status?: number };
+      };
+ 
+      if (err.message === "NEXT_REDIRECT") {
+        throw err;
+      }
 
-      if (typeof err === "object" && err !== null && "response" in err) {
-        const errorResponse = err as {
-          response?: { data?: { message?: string } };
-        };
-        message = errorResponse.response?.data?.message || message;
+      let message = "خطا در ثبت‌نام، لطفاً مجدداً تلاش کنید";
+
+      if (err.response?.data?.message) {
+        message = err.response.data.message;
       }
 
       toast.error(message);
@@ -73,7 +79,9 @@ function SignUp() {
       setIsSubmitting(false);
     }
   }
+
   return (
+    // ... کدهای UI دقیقاً مشابه قبل بدون تغییر
     <div
       className="min-h-screen bg-cover bg-center flex items-center justify-center"
       style={{ backgroundImage: "url('/image/1023.jpg')" }}
@@ -83,11 +91,7 @@ function SignUp() {
         className="w-full sm:w-100 flex items-center max-w-100 rounded-2xl backdrop-blur-xl mx-auto border-secondary shadow-[0px_5px_10px_5px_rgba(0,0,0,0.2)]"
       >
         <form onSubmit={handleSubmit(onSubmit)} className="w-full p-4">
-          <div
-            className=" text-text
-         text-lg flex items-center justify-center py-3 rounded-md mb-4.5 w-full "
-          >
-            {" "}
+          <div className=" text-text text-lg flex items-center justify-center py-3 rounded-md mb-4.5 w-full ">
             ثبت‌نام و ایجاد حساب کاربری
           </div>
           <div className="flex flex-col gap-2 mt-2.5 w-full h-24">
@@ -106,8 +110,6 @@ function SignUp() {
           <div className="flex flex-col gap-2 mt-2.5 w-full mb-3 h-24">
             <label>کلمه عبور</label>
             <div className="relative w-full">
-              {" "}
-              {/* Added relative wrapper */}
               <input
                 type={showPassword ? "text" : "password"}
                 {...register("password")}
@@ -162,8 +164,6 @@ function SignUp() {
           <div className="flex flex-col gap-2 mt-2.5 w-full mb-3 h-24">
             <label>تکرار کلمه عبور</label>
             <div className="relative w-full">
-              {" "}
-              {/* Added relative wrapper */}
               <input
                 type={showRepeatPassword ? "text" : "password"}
                 {...register("repeatPassword")}

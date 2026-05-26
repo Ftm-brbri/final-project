@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { useRouter, useSearchParams } from "next/navigation";
+
 import ProductsGrid from "@/src/components/products/products-grid";
 import ProductsFilter from "@/src/components/products/products-filter";
 import Pagination from "@/src/shared/components/pagination";
@@ -20,18 +22,29 @@ type Product = {
 const ITEMS_PER_PAGE = 8;
 
 export default function ProductsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // category from url
+  const categoryFromUrl = searchParams.get("category") || "all";
+
+  // states
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // filters
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedStock, setSelectedStock] = useState("all");
   const [selectedSort, setSelectedSort] = useState("newest");
 
   // pagination
   const [currentPage, setCurrentPage] = useState(1);
 
-  // FETCH DATA
+  // selected category directly from URL (NO useEffect needed)
+  const selectedCategory =
+    categoryFromUrl && categoryFromUrl.trim() !== ""
+      ? categoryFromUrl.toLowerCase().trim()
+      : "all";
+
+  // FETCH PRODUCTS
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -63,24 +76,27 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  // FILTER + SORT LOGIC (IMPORTANT FIX)
+  // FILTER + SORT
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    // category filter
+    // CATEGORY FILTER
     if (selectedCategory !== "all") {
-      result = result.filter((p) => p.category === selectedCategory);
+      result = result.filter(
+        (p) => p.category?.toLowerCase().trim() === selectedCategory,
+      );
     }
 
-    // stock filter
+    // STOCK FILTER
     if (selectedStock === "available") {
       result = result.filter((p) => p.stock > 0);
     }
+
     if (selectedStock === "unavailable") {
       result = result.filter((p) => p.stock === 0);
     }
 
-    // sorting
+    // SORTING
     if (selectedSort === "price-low") {
       result.sort((a, b) => a.price - b.price);
     }
@@ -90,23 +106,30 @@ export default function ProductsPage() {
     }
 
     if (selectedSort === "newest") {
-      result.reverse(); // fallback if no date field exists
+      result.reverse();
     }
 
     return result;
   }, [products, selectedCategory, selectedStock, selectedSort]);
 
-  // RESET PAGE (FIX: no direct setState in useEffect dependency issue)
+  // CATEGORY CHANGE
   const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
     setCurrentPage(1);
+
+    if (value === "all") {
+      router.push("/products");
+    } else {
+      router.push(`/products?category=${encodeURIComponent(value)}`);
+    }
   };
 
+  // STOCK CHANGE
   const handleStockChange = (value: string) => {
     setSelectedStock(value);
     setCurrentPage(1);
   };
 
+  // SORT CHANGE
   const handleSortChange = (value: string) => {
     setSelectedSort(value);
     setCurrentPage(1);
@@ -117,9 +140,11 @@ export default function ProductsPage() {
 
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
+
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
 
+  // LOADING
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center text-slate-500">
@@ -135,11 +160,11 @@ export default function ProductsPage() {
         <div className="lg:col-span-3">
           <ProductsFilter
             selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
+            setSelectedCategory={handleCategoryChange}
             selectedStock={selectedStock}
-            setSelectedStock={setSelectedStock}
+            setSelectedStock={handleStockChange}
             selectedSort={selectedSort}
-            setSelectedSort={setSelectedSort}
+            setSelectedSort={handleSortChange}
           />
         </div>
 
@@ -147,6 +172,7 @@ export default function ProductsPage() {
         <div className="lg:col-span-9">
           <div className="mb-6">
             <h1 className="text-2xl font-black text-slate-900">محصولات</h1>
+
             <p className="mt-1 text-slate-500">
               {filteredProducts.length.toLocaleString("fa-IR")} محصول یافت شد
             </p>

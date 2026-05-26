@@ -19,6 +19,7 @@ const categories = [
   { label: "کفش مردانه", value: "men shoes" },
   { label: "کفش زنانه", value: "women shoes" },
   { label: "تجهیزات", value: "equipment" },
+  { label: "استوک ورزشی", value: "stoke" },
 ];
 
 export default function ProductsFilter({
@@ -33,9 +34,7 @@ export default function ProductsFilter({
     <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
       {/* TITLE */}
       <div className="mb-6">
-        <h2 className="text-xl font-black text-slate-900">
-          فیلتر محصولات
-        </h2>
+        <h2 className="text-xl font-black text-slate-900">فیلتر محصولات</h2>
 
         <p className="mt-1 text-sm text-slate-500">
           محصولات موردنظر خود را پیدا کنید
@@ -44,9 +43,7 @@ export default function ProductsFilter({
 
       {/* CATEGORY */}
       <div className="mb-6">
-        <h3 className="mb-3 font-bold text-slate-800">
-          دسته‌بندی
-        </h3>
+        <h3 className="mb-3 font-bold text-slate-800">دسته‌بندی</h3>
 
         <div className="flex flex-wrap gap-2">
           {categories.map((item) => (
@@ -67,9 +64,7 @@ export default function ProductsFilter({
 
       {/* STOCK */}
       <div className="mb-6">
-        <h3 className="mb-3 font-bold text-slate-800">
-          موجودی
-        </h3>
+        <h3 className="mb-3 font-bold text-slate-800">موجودی</h3>
 
         <select
           value={selectedStock}
@@ -84,9 +79,7 @@ export default function ProductsFilter({
 
       {/* SORT */}
       <div>
-        <h3 className="mb-3 font-bold text-slate-800">
-          مرتب‌سازی
-        </h3>
+        <h3 className="mb-3 font-bold text-slate-800">مرتب‌سازی</h3>
 
         <select
           value={selectedSort}

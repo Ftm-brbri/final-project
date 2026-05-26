@@ -343,7 +343,7 @@ export default function SingleProductPage({ productId }: Props) {
 
               <div className="mt-6 h-px bg-slate-100" />
 
-              <div className="mt-6 flex items-center gap-4">
+              <div className="mt-6 flex flex-wrap items-center gap-4">
                 {/* QUANTITY */}
                 <div className="flex items-center rounded-2xl border border-slate-200 bg-slate-50 p-2">
                   <button
@@ -368,6 +368,19 @@ export default function SingleProductPage({ productId }: Props) {
                   >
                     <Plus size={18} />
                   </button>
+                </div>
+
+                {/* STOCK */}
+                <div
+                  className={`rounded-2xl px-4 py-3 text-sm font-bold ${
+                    product.stock > 0
+                      ? "bg-emerald-50 text-emerald-600"
+                      : "bg-red-50 text-red-500"
+                  }`}
+                >
+                  {product.stock > 0
+                    ? `موجودی: ${product.stock.toLocaleString("fa-IR")} عدد`
+                    : "ناموجود"}
                 </div>
 
                 {/* ADD TO CART */}

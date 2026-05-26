@@ -71,14 +71,14 @@ export default function PaymentGatewayPage() {
   };
 
   return (
-    <section dir="rtl" className="min-h-screen bg-[#f3f4f6] px-4 py-6">
+    <section dir="rtl" className="min-h-screen bg-[#f3f4f6] px-4 py-6 pt-24">
       <div className="mx-auto max-w-md overflow-hidden rounded-[30px] border border-slate-200 bg-white shadow-2xl">
         {/* HEADER */}
         <div className="bg-[#1d63d8] px-5 py-6 text-white">
           <div className="flex items-center justify-between">
-            <button className="rounded-full bg-white/20 px-4 py-2 text-sm font-medium">
+            {/* <button className="rounded-full bg-white/20 px-4 py-2 text-sm font-medium">
               English
-            </button>
+            </button> */}
 
             <div className="text-sm font-medium">درگاه پرداخت اینترنتی سِپ</div>
           </div>
@@ -141,6 +141,7 @@ export default function PaymentGatewayPage() {
               value={cvv2}
               onChange={(e) => setCvv2(e.target.value)}
               placeholder="CVV2"
+              maxLength={4}
               className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none focus:border-[#1d63d8]"
             />
           </div>
@@ -156,6 +157,7 @@ export default function PaymentGatewayPage() {
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
                 placeholder="ماه"
+                maxLength={2}
                 className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none focus:border-[#1d63d8]"
               />
 
@@ -163,30 +165,36 @@ export default function PaymentGatewayPage() {
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
                 placeholder="سال"
+                maxLength={2}
                 className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none focus:border-[#1d63d8]"
               />
             </div>
           </div>
 
           {/* CAPTCHA */}
-          <div className="mt-5">
-            <label className="mb-2 block text-sm font-bold text-slate-700">
+          <div className="mt-5" dir="ltr">
+            <label
+              className=" mb-2 block text-sm font-bold text-slate-700"
+              dir="rtl"
+            >
               کد امنیتی
             </label>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-3 w-full">
               <div className="flex items-center justify-center rounded-2xl bg-[#2459d3] text-4xl font-black tracking-widest text-white">
                 15562
               </div>
 
-              <button className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600">
-                <RefreshCcw size={18} />
+              <button className="flex items-center justify-center w-12 rounded-2xl border border-slate-200 bg-white text-slate-600">
+                <RefreshCcw size={15} />
               </button>
 
               <input
                 value={captcha}
                 onChange={(e) => setCaptcha(e.target.value)}
                 placeholder="کد امنیتی"
+                maxLength={5}
+                dir="rtl"
                 className="rounded-2xl border border-slate-200 bg-slate-50 px-4 outline-none focus:border-[#1d63d8]"
               />
             </div>
@@ -198,8 +206,8 @@ export default function PaymentGatewayPage() {
               رمز دوم / پویا
             </label>
 
-            <div className="grid grid-cols-3 gap-3">
-              <button className="rounded-2xl bg-[#1d63d8] px-4 py-4 font-bold text-white transition hover:opacity-90">
+            <div className="grid grid-cols-3 gap-10">
+              <button className="h-15 w-35 rounded-2xl bg-[#1d63d8] px-4 py-4 font-bold text-white transition hover:opacity-90">
                 دریافت رمز پویا
               </button>
 
@@ -207,6 +215,7 @@ export default function PaymentGatewayPage() {
                 value={secondPassword}
                 onChange={(e) => setSecondPassword(e.target.value)}
                 placeholder="رمز پویا"
+                maxLength={6}
                 className="col-span-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 outline-none focus:border-[#1d63d8]"
               />
             </div>
