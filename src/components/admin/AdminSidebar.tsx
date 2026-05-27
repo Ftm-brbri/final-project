@@ -65,8 +65,8 @@ export default function AdminSidebar() {
             <ShoppingBag size={22} className="lg:w-6 lg:h-6" />
           </div>
 
-          <div className="hidden lg:block">
-            <h2 className="text-2xl font-extrabold">اسپرتکس</h2>
+          <div className="hidden lg:block w-38">
+            <h2 className="text-2xl font-extrabold ">اسپرتکس</h2>
             <p className="mt-1 text-sm text-white/80">پنل مدیریت</p>
           </div>
         </div>

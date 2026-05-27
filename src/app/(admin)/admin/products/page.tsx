@@ -296,7 +296,10 @@ export default function ProductsPage() {
 
           <tbody>
             {paginatedProducts.map((p, index) => (
-              <tr key={p._id} className="border-b transition hover:bg-slate-50">
+              <tr
+                key={p._id}
+                className="border-b transition hover:bg-slate-50 text-center"
+              >
                 <td className="p-3 text-center">{startIndex + index + 1}</td>
 
                 <td className="p-3">

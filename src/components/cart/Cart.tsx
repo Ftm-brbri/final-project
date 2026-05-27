@@ -110,7 +110,6 @@ export default function Cart() {
     }
   };
 
-  // ✅ FIXED: consistent id usage
   const handleRemove = async (productId: string) => {
     try {
       setUpdatingId(productId);
@@ -184,9 +183,9 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <section dir="rtl" className="bg-slate-50 py-20 min-h-screen mt-40">
-        <div className="mx-auto max-w-7xl px-4 md:px-8 mt-40">
-          <div className="rounded-3xl bg-white p-16 text-center shadow-sm">
+      <section dir="rtl" className="bg-slate-50 py-20 min-h-screen">
+        <div className="mx-auto max-w-7xl px-4 md:px-8 mt-24">
+          <div className="rounded-3xl bg-white p-16 text-center shadow-sm ">
             <ShoppingBag className="mb-6 h-20 w-20 text-slate-300" />
             <h2 className="text-2xl font-black text-slate-800">
               سبد خرید شما خالی است
@@ -207,7 +206,7 @@ export default function Cart() {
   const total = cart?.totalPrice ?? 0;
 
   return (
-    <section dir="rtl" className="min-h-screen bg-slate-50 pt-20">
+    <section dir="rtl" className="min-h-screen bg-slate-50 pt-10 mt-20">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         <div className="mb-10 flex justify-between">
           <h1 className="text-3xl font-black">سبد خرید</h1>
@@ -300,17 +299,29 @@ export default function Cart() {
           {/* summary */}
           <div className="rounded-3xl bg-white p-6">
             <div className="flex justify-between">
-              <span>جمع کل</span>
+              <span>قیمت کالاها</span>
               <span>{total.toLocaleString("fa-IR")} تومان</span>
             </div>
-
+            <div className="flex justify-between mt-6">
+              <span>جمع سبد خرید</span>
+              <span>{total.toLocaleString("fa-IR")} تومان</span>
+            </div>
+            <div className="flex justify-between mt-6 text-green-700">
+              <span>سود شما از خرید</span>
+              <span>{0} تومان</span>
+            </div>
             <button
               onClick={() => router.push("/checkout")}
               className="mt-6 w-full rounded-2xl bg-orange-500 py-4 text-white"
             >
-              ادامه خرید
+              تائید و تکمیل سفارش{" "}
             </button>
+            <div className="text-sm text-gray-600 mt-6">
+            هزینه این سفارش هنوز پرداخت نشده‌ و در صورت اتمام موجودی، کالاها از
+            سبد حذف می‌شوند
           </div>
+          </div>
+          
         </div>
       </div>
     </section>

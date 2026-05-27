@@ -232,7 +232,7 @@ export default function QuantityPage() {
               return (
                 <tr
                   key={p._id}
-                  className="border-b transition hover:bg-slate-50"
+                  className="border-b transition hover:bg-slate-50 text-center"
                 >
                   {/* INDEX */}
                   <td className="p-3 text-center">{startIndex + index + 1}</td>
