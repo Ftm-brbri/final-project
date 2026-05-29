@@ -32,9 +32,7 @@ export default function ProductCard({ product }: Props) {
     <Link
       href={`/products/${product._id}`}
       className={`group relative block overflow-hidden rounded-[28px] border bg-white shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${
-        isOutOfStock
-          ? "border-red-100 opacity-75"
-          : "border-slate-200"
+        isOutOfStock ? "border-red-100 opacity-75" : "border-slate-200"
       }`}
     >
       {/* OUT OF STOCK */}
@@ -48,12 +46,6 @@ export default function ProductCard({ product }: Props) {
 
       {/* IMAGE */}
       <div className="relative overflow-hidden">
-        {/* BADGE */}
-        {/* <div className="absolute right-4 top-4 z-10 flex items-center gap-1 rounded-full bg-orange-500 px-3 py-1 text-xs font-bold text-white shadow-lg shadow-orange-500/30">
-          <Flame size={13} />
-          پرفروش
-        </div> */}
-
         {/* FAVORITE ICON */}
         <button
           onClick={(e) => e.preventDefault()}
@@ -68,9 +60,7 @@ export default function ProductCard({ product }: Props) {
           width={600}
           height={600}
           className={`h-[280px] w-full transition duration-700 group-hover:scale-110 ${
-            isOutOfStock
-              ? "object-contain p-6 grayscale"
-              : "object-contain p-6"
+            isOutOfStock ? "object-contain p-6 grayscale" : "object-contain p-6"
           }`}
         />
 
@@ -105,23 +95,19 @@ export default function ProductCard({ product }: Props) {
         {/* FOOTER */}
         <div className="flex items-center justify-between border-t border-slate-100 pt-4">
           <div>
-            <p className="text-xs text-slate-400">
-              قیمت محصول
-            </p>
+            <p className="text-xs text-slate-400">قیمت محصول</p>
 
             <div className="mt-1 flex items-center gap-1">
               <span className="text-2xl font-black text-slate-900">
                 {product.price.toLocaleString("fa-IR")}
               </span>
 
-              <span className="text-sm text-slate-500">
-                تومان
-              </span>
+              <span className="text-sm text-slate-500">تومان</span>
             </div>
           </div>
 
           <div
-            className={`flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-lg transition duration-300 ${
+            className={`block md:hidden flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-lg transition duration-300 ${
               isOutOfStock
                 ? "bg-slate-300"
                 : "bg-gradient-to-br from-orange-500 to-amber-400 shadow-orange-500/30 hover:scale-110"

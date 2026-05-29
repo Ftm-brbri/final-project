@@ -1,10 +1,7 @@
 "use client";
 
 import OrderStatusBadge from "@/src/components/orders/OrderStatusBadge";
-import {
-  clearUserAuth,
-  isUserLoggedIn,
-} from "@/src/lib/auth-keys";
+import { clearUserAuth, isUserLoggedIn } from "@/src/lib/auth-keys";
 import { notifyCartUpdated } from "@/src/lib/cart-events";
 import {
   fetchMyOrders,
@@ -52,20 +49,13 @@ export default function ProfileContent() {
 
   const initialTab =
     searchParams.get("tab") === "orders" ? "orders" : "profile";
-
   const [tab, setTab] = useState<Tab>(initialTab);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
-    if (!isUserLoggedIn()) {
-      setLoading(false);
-      return;
-    }
-
     try {
-      setLoading(true);
       const [user, ordersList] = await Promise.all([
         fetchUserProfile(),
         fetchMyOrders(),
@@ -83,15 +73,22 @@ export default function ProfileContent() {
   useEffect(() => {
     if (!isUserLoggedIn()) {
       router.replace("/auth");
+      setTimeout(() => setLoading(false), 0);
       return;
     }
-    loadData();
+    setTimeout(() => {
+      loadData();
+    }, 0);
   }, [loadData, router]);
 
   useEffect(() => {
     const t = searchParams.get("tab");
-    if (t === "orders") setTab("orders");
-  }, [searchParams]);
+    if (t === "orders" && tab !== "orders") {
+      setTimeout(() => setTab("orders"), 0);
+    } else if (t === "profile" && tab !== "profile") {
+      setTimeout(() => setTab("profile"), 0);
+    }
+  }, [searchParams, tab]);
 
   const handleLogout = () => {
     clearUserAuth();
@@ -142,7 +139,7 @@ export default function ProfileContent() {
             onClick={() => setTab("profile")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition ${
               tab === "profile"
-                ? "bg-gradient-to-r from-orange-500 to-amber-400 text-white shadow-lg"
+                ? "bg-linear-to-r from-orange-500 to-amber-400 text-white shadow-lg"
                 : "text-slate-600 hover:bg-slate-50"
             }`}
           >
@@ -154,7 +151,7 @@ export default function ProfileContent() {
             onClick={() => setTab("orders")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition ${
               tab === "orders"
-                ? "bg-gradient-to-r from-orange-500 to-amber-400 text-white shadow-lg"
+                ? "bg-linear-to-r from-orange-500 to-amber-400 text-white shadow-lg"
                 : "text-slate-600 hover:bg-slate-50"
             }`}
           >
@@ -163,7 +160,9 @@ export default function ProfileContent() {
             {orders.length > 0 && (
               <span
                 className={`rounded-full px-2 py-0.5 text-xs ${
-                  tab === "orders" ? "bg-white/25" : "bg-orange-100 text-orange-600"
+                  tab === "orders"
+                    ? "bg-white/25"
+                    : "bg-orange-100 text-orange-600"
                 }`}
               >
                 {orders.length.toLocaleString("fa-IR")}
@@ -175,7 +174,7 @@ export default function ProfileContent() {
         {tab === "profile" && profile && (
           <div className="rounded-3xl bg-white p-8 shadow-sm">
             <div className="mb-8 flex items-center gap-5">
-              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-orange-500 to-amber-400 text-2xl font-black text-white shadow-lg shadow-orange-500/30">
+              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-linear-to-br from-orange-500 to-amber-400 text-2xl font-black text-white shadow-lg shadow-orange-500/30">
                 {profile.name?.charAt(0) || "؟"}
               </div>
               <div>
@@ -231,7 +230,7 @@ export default function ProfileContent() {
                 </p>
                 <Link
                   href="/products"
-                  className="mt-6 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-8 py-3 font-bold text-white shadow-lg"
+                  className="mt-6 rounded-2xl bg-linear-to-r from-orange-500 to-amber-400 px-8 py-3 font-bold text-white shadow-lg"
                 >
                   مشاهده محصولات
                 </Link>

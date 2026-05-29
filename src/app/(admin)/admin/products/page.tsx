@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Pencil, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import Pagination from "@/src/shared/components/pagination";
+import toast from "react-hot-toast";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
 const BASE_URL = "https://maktab-shop.runflare.run";
@@ -122,7 +123,7 @@ export default function ProductsPage() {
       // setNewImages(null);
     } catch (error) {
       console.error(error);
-      alert("خطا در دریافت اطلاعات محصول");
+      toast("خطا در دریافت اطلاعات محصول");
       setShowEditModal(false);
     } finally {
       setModalLoading(false);
@@ -131,7 +132,7 @@ export default function ProductsPage() {
 
   // DELETE IMAGE
   const handleRemoveImage = (image: string) => {
-    console.log("image is: ",image);
+    console.log("image is: ", image);
     setEditForm((prev) => ({
       ...prev,
       images: prev.images.filter((img) => img !== image),
@@ -159,7 +160,7 @@ export default function ProductsPage() {
   // UPDATE PRODUCT
   const updateProduct = async () => {
     if (!selectedProduct) return;
-    console.log("editForm.images is: ",editForm.images);
+    console.log("editForm.images is: ", editForm.images);
     // return;
     try {
       setUpdating(true);
@@ -185,7 +186,7 @@ export default function ProductsPage() {
           formData.append("images", file);
         });
       }
-      console.log("formData is: ",formData.entries());
+      console.log("formData is: ", formData.entries());
       for (const pair of formData.entries()) {
         console.log(pair[0], pair[1]);
       }
@@ -212,10 +213,10 @@ export default function ProductsPage() {
 
       closeEditModal();
 
-      alert("محصول با موفقیت ویرایش شد");
+      toast("محصول با موفقیت ویرایش شد");
     } catch (error) {
       console.error(error);
-      alert("خطا در ویرایش محصول");
+      toast("خطا در ویرایش محصول");
     } finally {
       setUpdating(false);
     }
@@ -249,7 +250,7 @@ export default function ProductsPage() {
       }
     } catch (error) {
       console.error(error);
-      alert("خطا در حذف محصول");
+      toast("خطا در حذف محصول");
     }
   };
 

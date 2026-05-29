@@ -57,7 +57,7 @@ export default function SingleProductPage({ productId }: Props) {
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
-  // FAVORITES
+  // fav
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -110,7 +110,7 @@ export default function SingleProductPage({ productId }: Props) {
       img.startsWith("http") ? img : `${BASE_URL}${img}`,
     ) || [];
 
-  // ADD TO CART
+  //add
   const handleAddToCart = async () => {
     if (!product) return;
 
@@ -191,7 +191,7 @@ export default function SingleProductPage({ productId }: Props) {
     }
   };
 
-  // FAVORITES
+  //fav
   const handleAddToFavorite = async () => {
     if (!product) return;
 
@@ -260,9 +260,9 @@ export default function SingleProductPage({ productId }: Props) {
   return (
     <section dir="rtl" className="min-h-screen bg-slate-50 pb-20 pt-32">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
-        {/* TOP */}
+        
         <div className="grid gap-12 lg:grid-cols-2">
-          {/* IMAGES */}
+        
           <div className="space-y-5">
             <div className="relative aspect-square overflow-hidden rounded-4xl bg-white shadow-xl">
               {product.stock === 0 && (
@@ -284,7 +284,7 @@ export default function SingleProductPage({ productId }: Props) {
               />
             </div>
 
-            {/* THUMBNAILS */}
+            {/* thumb */}
             {images.length > 1 && (
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {images.map((img, index) => (
@@ -309,7 +309,7 @@ export default function SingleProductPage({ productId }: Props) {
             )}
           </div>
 
-          {/* INFO */}
+          {/*info*/}
           <div>
             <div className="mb-4 flex flex-wrap items-center gap-3">
               <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-600">
@@ -344,7 +344,7 @@ export default function SingleProductPage({ productId }: Props) {
               <div className="mt-6 h-px bg-slate-100" />
 
               <div className="mt-6 flex flex-wrap items-center gap-4">
-                {/* QUANTITY */}
+                {/*quant*/}
                 <div className="flex items-center rounded-2xl border border-slate-200 bg-slate-50 p-2">
                   <button
                     onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
@@ -370,7 +370,7 @@ export default function SingleProductPage({ productId }: Props) {
                   </button>
                 </div>
 
-                {/* STOCK */}
+                
                 <div
                   className={`rounded-2xl px-4 py-3 text-sm font-bold ${
                     product.stock > 0
@@ -383,7 +383,7 @@ export default function SingleProductPage({ productId }: Props) {
                     : "ناموجود"}
                 </div>
 
-                {/* ADD TO CART */}
+                {/*add*/}
                 <button
                   onClick={handleAddToCart}
                   disabled={adding || product.stock === 0}
@@ -395,9 +395,9 @@ export default function SingleProductPage({ productId }: Props) {
                 </button>
               </div>
 
-              {/* ACTIONS */}
+              {/*action*/}
               <div className="mt-5 flex items-center gap-3">
-                {/* FAVORITE BUTTON */}
+                {/*fav*/}
                 <button
                   onClick={handleAddToFavorite}
                   disabled={favoriteLoading}
@@ -414,14 +414,14 @@ export default function SingleProductPage({ productId }: Props) {
                   )}
                 </button>
 
-                {/* SHARE */}
+                {/*share*/}
                 <button className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-500">
                   <Share2 />
                 </button>
               </div>
             </div>
 
-            {/* DESCRIPTION */}
+            {/*desc*/}
             <div className="mt-8 rounded-3xl bg-white p-8 shadow-sm">
               <h2 className="text-2xl font-black text-slate-900">
                 توضیحات محصول

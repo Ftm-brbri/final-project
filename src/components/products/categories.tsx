@@ -62,7 +62,7 @@ function CategoryCard({
   return (
     <div
       onClick={onClick}
-      className={`group relative overflow-hidden rounded-[28px] cursor-pointer ${
+      className={`group relative overflow-hidden rounded-[28px] cursor-pointer  bg-black/7  hover:bg-black/20 ${
         item.large ? "min-h-[620px]" : "min-h-[300px]"
       }`}
     >
@@ -135,17 +135,6 @@ function Category() {
               خرید بر اساس دسته‌بندی
             </h2>
           </div>
-
-          <button
-            onClick={() => router.push("/products")}
-            className="group flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-4 text-white transition hover:bg-orange-500 "
-          >
-            مشاهده همه محصولات
-            <ArrowLeft
-              size={18}
-              className="transition group-hover:-translate-x-1 "
-            />
-          </button>
         </div>
 
         {/* Grid */}
@@ -161,7 +150,7 @@ function Category() {
           )}
 
           {/* Small Cards */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:col-span-7">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:col-span-7 ">
             {otherCategories.map((item) => (
               <CategoryCard
                 key={item.id}

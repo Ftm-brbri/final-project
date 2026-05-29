@@ -219,7 +219,9 @@ export default function OrdersPage() {
   }, [activeTab, currentPage]);
 
   useEffect(() => {
-    loadOrders();
+    setTimeout(() => {
+      loadOrders();
+    }, 0);
   }, [loadOrders]);
 
   const handleTabChange = (tab: OrderStatus) => {

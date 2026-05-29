@@ -8,8 +8,10 @@ export default function Page() {
     <div>
       <HeroSlider />
       <MostSaled />
-      <Category/>
-      <HeroBanner/>
+      <div id="categories-section">
+        <Category />
+      </div>
+      <HeroBanner />
     </div>
   );
 }

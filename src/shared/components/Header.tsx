@@ -20,10 +20,6 @@ const navItems = [
     href: "/products",
   },
   {
-    label: "برندها",
-    href: "/brands",
-  },
-  {
     label: "دسته‌بندی‌ها",
     href: "/categories",
   },
@@ -56,9 +52,13 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    setLoggedIn(isUserLoggedIn());
-    const user = getStoredUserProfile();
-    setUserName(user?.name || "");
+    const timeoutId = setTimeout(() => {
+      setLoggedIn(isUserLoggedIn());
+      const user = getStoredUserProfile();
+      setUserName(user?.name || "");
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, [pathname]);
 
   useEffect(() => {
@@ -88,6 +88,20 @@ export default function Header() {
     window.addEventListener(CART_UPDATED_EVENT, onCartUpdated);
     return () => window.removeEventListener(CART_UPDATED_EVENT, onCartUpdated);
   }, [dispatch]);
+  //the handle for the category part
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    if (href === "/categories" && pathname === "/") {
+      e.preventDefault();
+      const element = document.getElementById("categories-section");
+      if (element) {
+        const y = element.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    }
+  };
 
   return (
     <header
@@ -130,6 +144,7 @@ export default function Header() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      onClick={(e) => handleNavClick(e, item.href)}
                       className={`relative text-sm font-bold transition ${
                         isActive
                           ? "text-amber-300"
@@ -139,7 +154,7 @@ export default function Header() {
                       {item.label}
 
                       {isActive && (
-                        <span className="absolute -bottom-2 right-0 h-[3px] w-full rounded-full bg-gradient-to-l from-orange-500 to-amber-400 shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
+                        <span className="absolute -bottom-2 right-0 h-[3px] w-full rounded-full bg-linear-to-l from-orange-500 to-amber-400 shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
                       )}
                     </Link>
                   </li>
@@ -179,7 +194,7 @@ export default function Header() {
           >
             <ShoppingCart size={20} />
             {cartCount > 0 && (
-              <span className="absolute -left-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-1 text-[10px] font-bold text-white shadow-md shadow-orange-500/50">
+              <span className="absolute -left-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-linear-to-r from-orange-500 to-amber-400 px-1 text-[10px] font-bold text-white shadow-md shadow-orange-500/50">
                 {cartCount > 99 ? "99+" : cartCount.toLocaleString("fa-IR")}
               </span>
             )}
@@ -191,14 +206,12 @@ export default function Header() {
               className="flex items-center gap-2 rounded-2xl border border-orange-400/40 bg-orange-500/15 px-5 py-3 text-sm font-bold text-amber-50 backdrop-blur-xl transition hover:border-orange-400 hover:bg-orange-500/30 hover:text-white"
             >
               <User size={18} />
-              <span className="hidden sm:inline">
-                {userName || "پروفایل"}
-              </span>
+              <span className="hidden sm:inline">{userName || "پروفایل"}</span>
             </Link>
           ) : (
             <button
               onClick={() => router.push("/auth")}
-              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-orange-600/40 transition hover:scale-[1.03] hover:from-orange-600 hover:to-amber-500 hover:shadow-orange-500/50"
+              className="flex items-center gap-2 rounded-2xl bg-linear-to-r from-orange-500 to-amber-400 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-orange-600/40 transition hover:scale-[1.03] hover:from-orange-600 hover:to-amber-500 hover:shadow-orange-500/50"
             >
               <User size={18} />
               ورود / ثبت‌نام
@@ -217,7 +230,7 @@ export default function Header() {
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed right-0 top-0 z-50 flex h-full w-[85%] max-w-sm flex-col border-l border-orange-500/20 bg-gradient-to-b from-slate-900 to-slate-950 p-6 shadow-2xl shadow-black/50 transition-transform duration-300 lg:hidden ${
+        className={`fixed right-0 top-0 z-50 flex h-full w-[85%] max-w-sm min-h-screen flex-col border-l border-orange-500/20 bg-slate-700 from-slate-900 to-slate-950 p-6 shadow-2xl shadow-black/50 transition-transform duration-300 lg:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -239,6 +252,18 @@ export default function Header() {
         </div>
 
         {/* Mobile Search */}
+        <div className="mb-6">
+          <div className="flex w-full items-center overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/80 shadow-inner shadow-black/20 backdrop-blur-xl transition-all focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-500/25">
+            <div className="px-4 text-orange-400/80">
+              <Search size={20} />
+            </div>
+            <input
+              type="text"
+              placeholder="جستجو در اسپرتکس..."
+              className="w-full bg-transparent py-3.5 pr-1 pl-4 text-sm text-slate-100 outline-none placeholder:text-slate-400"
+            />
+          </div>
+        </div>
         <nav className="flex-1">
           <ul className="space-y-3">
             {navItems.map((item) => {
@@ -248,11 +273,14 @@ export default function Header() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    onClick={() => setIsOpen(false)}
+                    onClick={(e) => {
+                      setIsOpen(false);
+                      handleNavClick(e, item.href);
+                    }}
                     className={`block rounded-2xl px-5 py-4 text-sm font-bold transition ${
                       isActive
-                        ? "bg-gradient-to-l from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/30"
-                        : "border border-transparent bg-slate-800/60 text-slate-200 hover:border-orange-500/30 hover:bg-slate-800 hover:text-amber-100"
+                        ? "bg-linear-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/30"
+                        : "border border-transparent bg-slate-800 text-slate-200 hover:border-orange-500/30 hover:bg-slate-800 hover:text-amber-100"
                     }`}
                   >
                     {item.label}
@@ -266,8 +294,8 @@ export default function Header() {
                 onClick={() => setIsOpen(false)}
                 className={`flex items-center justify-between rounded-2xl px-5 py-4 text-sm font-bold transition ${
                   pathname === "/cart"
-                    ? "bg-gradient-to-l from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/30"
-                    : "border border-transparent bg-slate-800/60 text-slate-200 hover:border-orange-500/30 hover:bg-slate-800 hover:text-amber-100"
+                    ? "bg-linear-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/30"
+                    : "border border-transparent bg-slate-800 text-slate-200 hover:border-orange-500/30 hover:bg-slate-800 hover:text-amber-100"
                 }`}
               >
                 سبد خرید
@@ -286,8 +314,8 @@ export default function Header() {
                     onClick={() => setIsOpen(false)}
                     className={`block rounded-2xl px-5 py-4 text-sm font-bold transition ${
                       pathname === "/profile"
-                        ? "bg-gradient-to-l from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/30"
-                        : "border border-transparent bg-slate-800/60 text-slate-200 hover:border-orange-500/30 hover:bg-slate-800 hover:text-amber-100"
+                        ? "bg-linear-to-l from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/30"
+                        : "border border-transparent bg-slate-800 text-slate-200 hover:border-orange-500/30 hover:bg-slate-800 hover:text-amber-100"
                     }`}
                   >
                     پروفایل
@@ -308,7 +336,7 @@ export default function Header() {
                 <Link
                   href="/auth"
                   onClick={() => setIsOpen(false)}
-                  className="block rounded-2xl bg-gradient-to-l from-orange-500 to-amber-500 px-5 py-4 text-sm font-bold text-white shadow-md shadow-orange-500/30"
+                  className="block rounded-2xl bg-linear-to-l from-orange-500 to-amber-500 px-5 py-4 text-sm font-bold text-white shadow-md shadow-orange-500/30"
                 >
                   ورود / ثبت‌نام
                 </Link>

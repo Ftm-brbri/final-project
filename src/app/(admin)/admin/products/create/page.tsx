@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
+import toast from "react-hot-toast";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
 
@@ -73,7 +74,7 @@ const TiptapEditor = ({
 
       onChange(editor.getHTML());
     } catch {
-      alert("ابتدا متن را انتخاب کنید");
+      toast("ابتدا متن را انتخاب کنید");
     }
   };
 
@@ -213,12 +214,12 @@ export default function CreateProductPage() {
       const token = localStorage.getItem("admin_token");
 
       if (!token) {
-        alert("ادمین لاگین نیست");
+        toast("ادمین لاگین نیست");
         return;
       }
 
       if (!images || images.length === 0) {
-        alert("حداقل یک تصویر انتخاب کنید");
+        toast("حداقل یک تصویر انتخاب کنید");
         return;
       }
 
@@ -253,18 +254,18 @@ export default function CreateProductPage() {
 
       console.log(response.data);
 
-      alert("محصول با موفقیت ایجاد شد");
+      toast("محصول با موفقیت ایجاد شد");
 
       router.push("/admin/products");
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         console.log(err.response?.data);
 
-        alert(err.response?.data?.message || "خطا در ایجاد محصول");
+        toast(err.response?.data?.message || "خطا در ایجاد محصول");
       } else {
         console.error(err);
 
-        alert("خطای ناشناخته");
+        toast("خطای ناشناخته");
       }
     } finally {
       setLoading(false);

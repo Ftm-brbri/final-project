@@ -38,11 +38,11 @@ export default function Pagination({
   const pages = getPageNumbers();
 
   return (
-    <div className="flex items-center justify-center gap-2" dir="rtl">
+    <div className="flex items-center justify-center gap-1 sm:gap-2" dir="rtl">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 px-4 py-2 text-white transition-opacity disabled:opacity-50"
+        className="rounded-lg sm:rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 px-2 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base text-white transition-opacity disabled:opacity-50"
       >
         قبلی
       </button>
@@ -52,7 +52,7 @@ export default function Pagination({
           key={index}
           onClick={() => typeof page === "number" && onPageChange(page)}
           disabled={page === "..."}
-          className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${
+          className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl text-sm sm:text-base transition-colors ${
             page === currentPage
               ? "bg-[#1c2434] text-white"
               : page === "..."
@@ -67,7 +67,7 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 px-4 py-2 text-white transition-opacity disabled:opacity-50"
+        className="rounded-lg sm:rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 px-2 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base text-white transition-opacity disabled:opacity-50"
       >
         بعدی
       </button>
