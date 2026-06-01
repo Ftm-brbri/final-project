@@ -79,7 +79,7 @@ export default function Cart() {
     syncCartCount(data);
   };
 
-  // ✅ FIXED: consistent productId usage
+
   const handleUpdateQuantity = async (
     item: CartLineItem,
     type: "increase" | "decrease",
@@ -112,7 +112,7 @@ export default function Cart() {
 
   const handleRemove = async (productId: string) => {
     try {
-      console.log(cart)
+      console.log(cart);
       setUpdatingId(productId);
 
       const res = await removeFromCart(productId);
@@ -162,7 +162,7 @@ export default function Cart() {
 
             <Link
               href="/auth"
-              className="mt-8 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-8 py-4 font-bold text-white"
+              className="mt-8 rounded-2xl bg-linear-to-r from-orange-500 to-amber-400 px-8 py-4 font-bold text-white"
             >
               ورود / ثبت‌نام
             </Link>
@@ -194,7 +194,7 @@ export default function Cart() {
 
             <Link
               href="/products"
-              className="mt-8 inline-flex rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-8 py-4 font-bold text-white"
+              className="mt-8 inline-flex rounded-2xl bg-linear-to-r from-orange-500 to-amber-400 px-8 py-4 font-bold text-white"
             >
               مشاهده محصولات
             </Link>
@@ -318,11 +318,10 @@ export default function Cart() {
               تائید و تکمیل سفارش{" "}
             </button>
             <div className="text-sm text-gray-600 mt-6">
-            هزینه این سفارش هنوز پرداخت نشده‌ و در صورت اتمام موجودی، کالاها از
-            سبد حذف می‌شوند
+              هزینه این سفارش هنوز پرداخت نشده‌ و در صورت اتمام موجودی، کالاها
+              از سبد حذف می‌شوند
+            </div>
           </div>
-          </div>
-          
         </div>
       </div>
     </section>

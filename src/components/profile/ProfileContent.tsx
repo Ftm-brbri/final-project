@@ -46,6 +46,9 @@ export default function ProfileContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
+  const [phone, setPhone] = useState("");
+
+  const [address, setAddress] = useState("");
 
   const initialTab =
     searchParams.get("tab") === "orders" ? "orders" : "profile";
@@ -53,7 +56,7 @@ export default function ProfileContent() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [isSaving, setIsSaving] = useState(false);
   const loadData = useCallback(async () => {
     try {
       const [user, ordersList] = await Promise.all([
@@ -89,6 +92,14 @@ export default function ProfileContent() {
       setTimeout(() => setTab("profile"), 0);
     }
   }, [searchParams, tab]);
+  useEffect(() => {
+    if (profile) {
+      setTimeout(() => {
+        setPhone(profile.phone || "");
+        setAddress(profile.address || "");
+      }, 0);
+    }
+  }, [profile]);
 
   const handleLogout = () => {
     clearUserAuth();
@@ -97,7 +108,44 @@ export default function ProfileContent() {
     toast.success("با موفقیت خارج شدید");
     router.push("/");
   };
+  const handleUpdateProfile = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch("/api/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: profile?.name || "",
+          phone: phone,
+          address: address,
+        }),
+      });
 
+      if (response.status === 401) {
+        toast.error("شما وارد نشده‌اید (Unauthorized).");
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("خطا در ارتباط با سرور");
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success("اطلاعات حساب کاربری با موفقیت بروزرسانی شد!");
+      } else {
+        toast.error("خطا در بروزرسانی اطلاعات.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("مشکلی در ذخیره اطلاعات پیش آمد.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
   if (loading) {
     return (
       <section
@@ -193,17 +241,46 @@ export default function ProfileContent() {
                 label="ایمیل"
                 value={profile.email}
               />
-              <ProfileField
-                icon={<Phone size={18} />}
-                label="شماره تماس"
-                value={profile.phone || "—"}
-              />
-              <ProfileField
-                icon={<MapPin size={18} />}
-                label="آدرس"
-                value={profile.address || "ثبت نشده"}
-                className="sm:col-span-2"
-              />
+
+              <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 focus-within:border-orange-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-100 transition-all">
+                <div className="text-orange-500">
+                  <Phone size={18} />
+                </div>
+                <div className="w-full">
+                  <p className="text-xs font-medium text-slate-400">
+                    شماره تماس
+                  </p>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => {
+                      const numericValue = e.target.value.replace(/\D/g, "");
+                      if (numericValue.length <= 11) {
+                        setPhone(numericValue);
+                      }
+                    }}
+                    placeholder="—"
+                    className="mt-1 w-full bg-transparent font-bold text-slate-800 outline-none placeholder:font-normal placeholder:text-slate-400"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:col-span-2 focus-within:border-orange-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-100 transition-all">
+                <div className="text-orange-500 mt-1">
+                  <MapPin size={18} />
+                </div>
+                <div className="w-full">
+                  <p className="text-xs font-medium text-slate-400">آدرس</p>
+                  <textarea
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="ثبت نشده"
+                    rows={2}
+                    className="mt-1 w-full resize-none bg-transparent font-bold text-slate-800 outline-none placeholder:font-normal placeholder:text-slate-400"
+                  />
+                </div>
+              </div>
+
               {profile.createdAt && (
                 <ProfileField
                   icon={<Calendar size={18} />}
@@ -213,6 +290,17 @@ export default function ProfileContent() {
                   )}
                 />
               )}
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                onClick={handleUpdateProfile}
+                disabled={isSaving}
+                className="rounded-xl bg-orange-500 px-6 py-2.5 font-bold text-white shadow-sm transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isSaving ? "در حال ذخیره..." : "ذخیره تغییرات"}
+              </button>
             </div>
           </div>
         )}

@@ -7,7 +7,12 @@ import Pagination from "@/src/shared/components/pagination";
 
 const API_URL = "https://maktab-shop.runflare.run/api";
 
-type OrderStatus = "pending" | "confirmed" | "cancelled";
+type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "cancelled"
+  | "shipping"
+  | "delivered";
 
 type Order = {
   _id: string;
@@ -25,12 +30,16 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
   pending: "در انتظار",
   confirmed: "تأیید شده",
   cancelled: "رد شده",
+  shipping: "ارسال شده",
+  delivered: "دریافت شده",
 };
 
 const STATUS_BADGE: Record<OrderStatus, string> = {
   pending: "bg-yellow-100 text-yellow-700",
   confirmed: "bg-green-100 text-green-700",
   cancelled: "bg-red-100 text-red-700",
+  shipping: "bg-orange-100 text-orange-700",
+  delivered: "bg-blue-100 text-blue-700",
 };
 
 const TABS: {
@@ -57,12 +66,26 @@ const TABS: {
     border: "border-red-400",
     activeTab: "border-red-500 text-red-700",
   },
+  {
+    id: "shipping",
+    label: "ارسال شده",
+    border: "border-orange-400",
+    activeTab: "border-orange-500 text-orange-700",
+  },
+  {
+    id: "delivered",
+    label: "دریافت شده",
+    border: "border-blue-400",
+    activeTab: "border-blue-500 text-blue-700",
+  },
 ];
 
 const EMPTY_MESSAGES: Record<OrderStatus, string> = {
   pending: "سفارشی در انتظار وجود ندارد",
   confirmed: "سفارشی تأیید شده وجود ندارد",
   cancelled: "سفارش رد شده‌ای وجود ندارد",
+  shipping: "سفارش ارسال شده‌ای وجود ندارد",
+  delivered: "سفارش دریافت شده‌ای وجود ندارد",
 };
 
 function OrderCard({
@@ -92,6 +115,16 @@ function OrderCard({
       status: "cancelled" as const,
       label: "رد",
       className: "border-red-300 text-red-700 hover:bg-red-50",
+    },
+    {
+      status: "shipping" as const,
+      label: "ارسال",
+      className: "border-orange-300 text-orange-700 hover:bg-orange-50",
+    },
+    {
+      status: "delivered" as const,
+      label: "دریافت",
+      className: "border-blue-300 text-blue-700 hover:bg-blue-50",
     },
   ];
 
@@ -162,6 +195,8 @@ export default function OrdersPage() {
     pending: 1,
     confirmed: 1,
     cancelled: 1,
+    shipping: 1,
+    delivered: 1,
   });
   const [totalPages, setTotalPages] = useState(1);
 

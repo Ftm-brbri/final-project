@@ -5,6 +5,7 @@
 
 @theme {
   --color-primary: #efc030;
+  --font-sans: var(--font-roboto), "vazir", sans-serif;
 }
 @font-face {
   font-family: "vazir";
@@ -24,6 +25,6 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
 }

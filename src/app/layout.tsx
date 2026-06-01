@@ -1,7 +1,17 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local"; // اضافه شدن ایمپورت localFont
+
 import "./globals.css";
 import StoreProvider from "../store/storeProvider";
 import { Toaster } from "react-hot-toast";
+
+// تعریف فونت محلی
+const roboto = localFont({
+  // نام فایل دقیق را با توجه به فایل‌های موجود در پوشه Roboto جایگزین کنید
+  src: "../../public/fonts/vazir-font-v16.1.0/Roboto/Roboto-VariableFont_wdth,wght.ttf", 
+  variable: "--font-roboto",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Sportex",
@@ -30,7 +40,10 @@ export default function RootLayout({
 }) {
   return (
     <html dir="rtl" lang="fa">
-      <body className="bg-gray-50 text-gray-900 font-sans antialiased">
+      <body
+        // استفاده از roboto.variable برای اعمال متغیر CSS
+        className={`bg-gray-50 text-gray-900 font-sans antialiased ${roboto.variable}`}
+      >
         <StoreProvider>
           {children}
           <Toaster

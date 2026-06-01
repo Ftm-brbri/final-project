@@ -47,7 +47,7 @@ function SignIn() {
 
       await saveUserSession(res.data);
       toast.success(res.message || "ورود با موفقیت انجام شد");
-      router.push("/profile");
+      router.push("/products");
     } catch (error) {
       const err = error as Error & {
         response?: { data?: { message?: string }; status?: number };
