@@ -25,7 +25,7 @@ export default function AdminHeader() {
     >
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-400 text-white shadow-lg shadow-orange-500/30">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br from-orange-500 to-amber-400 text-white shadow-lg shadow-orange-500/30">
             <User size={22} />
           </div>
 
