@@ -25,7 +25,7 @@ const navItems = [
   },
   {
     label: "تماس با ما",
-    href: "/contact",
+    href: "/contact-us",
   },
 ];
 export default function Header() {

@@ -26,11 +26,11 @@ const customerLinks = [
 const usefulLinks = [
   {
     label: "درباره ما",
-    href: "/about",
+    href: "/about-us",
   },
   {
     label: "تماس با ما",
-    href: "/contact",
+    href: "/contact-us",
   },
   {
     label: "فروشگاه",

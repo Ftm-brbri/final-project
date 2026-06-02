@@ -56,6 +56,7 @@ export default function SingleProductPage({ productId }: Props) {
 
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [showControls, setShowControls] = useState(false);
 
   // fav
   const [favoriteLoading, setFavoriteLoading] = useState(false);
@@ -190,7 +191,34 @@ export default function SingleProductPage({ productId }: Props) {
       setAdding(false);
     }
   };
+  // update cart
+  const handleUpdateCart = async (currentQuantity: number) => {
+    console.log(currentQuantity);
+    if (!product) return;
 
+    try {
+      setAdding(true);
+
+      const res = await addToCart(product._id, currentQuantity - 1);
+
+      if (!res?.success) {
+        toast.error(res?.message || "خطا در به‌روزرسانی سبد خرید");
+        return;
+      }
+
+      const stock = getCartItemCount(res.data ?? null);
+      dispatch(setCartItemCount(stock));
+      notifyCartUpdated(stock);
+
+      toast.success("تعداد با موفقیت به‌روزرسانی شد", { duration: 3000 });
+
+      setShowControls(false);
+    } catch {
+      toast.error("موجودی کافی نیست");
+    } finally {
+      setAdding(false);
+    }
+  };
   //fav
   const handleAddToFavorite = async () => {
     if (!product) return;
@@ -260,9 +288,7 @@ export default function SingleProductPage({ productId }: Props) {
   return (
     <section dir="rtl" className="min-h-screen bg-slate-50 pb-20 pt-32">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
-        
         <div className="grid gap-12 lg:grid-cols-2">
-        
           <div className="space-y-5">
             <div className="relative aspect-square overflow-hidden rounded-4xl bg-white shadow-xl">
               {product.stock === 0 && (
@@ -315,7 +341,6 @@ export default function SingleProductPage({ productId }: Props) {
               <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-600">
                 {product.category}
               </span>
-
               {product.stock > 0 ? (
                 <span className="flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-600">
                   <Check size={16} />
@@ -343,56 +368,73 @@ export default function SingleProductPage({ productId }: Props) {
 
               <div className="mt-6 h-px bg-slate-100" />
 
-              <div className="mt-6 flex flex-wrap items-center gap-4">
-                {/*quant*/}
-                <div className="flex items-center rounded-2xl border border-slate-200 bg-slate-50 p-2">
-                  <button
-                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm transition hover:bg-orange-50"
-                  >
-                    <Minus size={18} />
-                  </button>
-
-                  <span className="w-14 text-center text-lg font-black">
-                    {quantity}
-                  </span>
-
-                  <button
-                    onClick={() =>
-                      setQuantity((prev) =>
-                        product ? Math.min(prev + 1, product.stock) : prev,
-                      )
-                    }
-                    disabled={quantity >= product.stock}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-r from-orange-500 to-amber-400 text-white transition disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    <Plus size={18} />
-                  </button>
-                </div>
-
-                
-                <div
-                  className={`rounded-2xl px-4 py-3 text-sm font-bold ${
-                    product.stock > 0
-                      ? "bg-emerald-50 text-emerald-600"
-                      : "bg-red-50 text-red-500"
-                  }`}
-                >
-                  {product.stock > 0
-                    ? `موجودی: ${product.stock.toLocaleString("fa-IR")} عدد`
-                    : "ناموجود"}
-                </div>
-
-                {/*add*/}
+              <div className="mt-6 relative flex w-full flex-col">
                 <button
-                  onClick={handleAddToCart}
+                  onClick={() => {
+                    if (showControls) {
+                      handleUpdateCart(quantity); // باید تابعی برای آپدیت (معمولا با متد PUT/PATCH) داشته باشید
+                    } else {
+                      handleAddToCart();
+                      setShowControls(true);
+                    }
+                  }}
                   disabled={adding || product.stock === 0}
-                  className="flex h-14 flex-1 items-center justify-center gap-3 rounded-2xl bg-linear-to-r from-orange-500 to-amber-400 font-bold text-white shadow-lg shadow-orange-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="relative z-20 flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-linear-to-r from-orange-500 to-amber-400 font-bold text-white shadow-lg shadow-orange-500/20 transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <ShoppingBag size={20} />
-
-                  {adding ? "در حال افزودن..." : "افزودن به سبد خرید"}
+                  {adding
+                    ? "در حال پردازش..."
+                    : showControls
+                      ? "به روز رسانی سبد خرید"
+                      : "افزودن به سبد خرید"}
                 </button>
+                <div
+                  className={`absolute left-0 right-0 top-full z-10 flex flex-wrap items-center justify-between gap-4 transition-all duration-500 ease-in-out ${
+                    showControls
+                      ? "pointer-events-auto translate-y-4 opacity-100"
+                      : "pointer-events-none -translate-y-10 opacity-0"
+                  }`}
+                >
+                  {/* Quantity */}
+                  <div className="flex items-center rounded-2xl border border-slate-200 bg-slate-50 p-2">
+                    <button
+                      onClick={() =>
+                        setQuantity((prev) => Math.max(1, prev - 1))
+                      }
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm transition hover:bg-orange-50"
+                    >
+                      <Minus size={18} />
+                    </button>
+                    <span className="w-14 text-center text-lg font-black">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setQuantity((prev) =>
+                          product ? Math.min(prev + 1, product.stock) : prev,
+                        )
+                      }
+                      disabled={quantity >= product.stock}
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-r from-orange-500 to-amber-400 text-white transition disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <Plus size={18} />
+                    </button>
+                  </div>
+                  <div
+                    className={`rounded-2xl px-4 py-3 text-sm font-bold ${
+                      product.stock > 0
+                        ? "bg-emerald-50 text-emerald-600"
+                        : "bg-red-50 text-red-500"
+                    }`}
+                  >
+                    {product.stock > 0
+                      ? `موجودی: ${product.stock.toLocaleString("fa-IR")} عدد`
+                      : "ناموجود"}
+                  </div>
+                </div>
+                <div
+                  className={`transition-all duration-500 ${showControls ? "h-20" : "h-0"}`}
+                ></div>
               </div>
 
               {/*action*/}

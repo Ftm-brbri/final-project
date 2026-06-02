@@ -22,7 +22,7 @@ export default function AdminSidebar() {
     {
       name: "داشبورد",
       icon: <LayoutDashboard size={20} />,
-      href: "/dashboard",
+      href: "/admin",
     },
     {
       name: "ادمین‌ها",
