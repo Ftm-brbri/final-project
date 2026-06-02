@@ -10,10 +10,11 @@ import {
   type OrderItem,
 } from "@/src/lib/orders-api";
 import {
-  fetchUserProfile,
+  fetchProfile,
   getStoredUserProfile,
   type UserProfile,
 } from "@/src/lib/user-api";
+import userAxios from "@/src/lib/userAxios";
 import { setCartItemCount } from "@/src/store/cartSlice";
 import {
   Calendar,
@@ -60,10 +61,13 @@ export default function ProfileContent() {
   const loadData = useCallback(async () => {
     try {
       const [user, ordersList] = await Promise.all([
-        fetchUserProfile(),
+        fetchProfile(),
         fetchMyOrders(),
       ]);
-      setProfile(user ?? getStoredUserProfile());
+      const profileData = user ?? getStoredUserProfile();
+      setProfile(profileData);
+      setPhone(profileData?.phone ?? "");
+      setAddress(profileData?.address ?? "");
       setOrders(ordersList);
     } catch {
       toast.error("خطا در بارگذاری اطلاعات");
@@ -111,30 +115,18 @@ export default function ProfileContent() {
   const handleUpdateProfile = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch("/api/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: profile?.name || "",
-          phone: phone,
-          address: address,
-        }),
+      const { data } = await userAxios.put("/profile", {
+        name: profile?.name || "",
+        phone,
+        address,
       });
 
-      if (response.status === 401) {
-        toast.error("شما وارد نشده‌اید (Unauthorized).");
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error("خطا در ارتباط با سرور");
-      }
-
-      const data = await response.json();
-
       if (data.success) {
+        setProfile((prev) =>
+          prev
+            ? { ...prev, phone, address }
+            : prev,
+        );
         toast.success("اطلاعات حساب کاربری با موفقیت بروزرسانی شد!");
       } else {
         toast.error("خطا در بروزرسانی اطلاعات.");
@@ -185,11 +177,10 @@ export default function ProfileContent() {
           <button
             type="button"
             onClick={() => setTab("profile")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition ${
-              tab === "profile"
-                ? "bg-linear-to-r from-orange-500 to-amber-400 text-white shadow-lg"
-                : "text-slate-600 hover:bg-slate-50"
-            }`}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition ${tab === "profile"
+              ? "bg-linear-to-r from-orange-500 to-amber-400 text-white shadow-lg"
+              : "text-slate-600 hover:bg-slate-50"
+              }`}
           >
             <User size={18} />
             اطلاعات کاربری
@@ -197,21 +188,19 @@ export default function ProfileContent() {
           <button
             type="button"
             onClick={() => setTab("orders")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition ${
-              tab === "orders"
-                ? "bg-linear-to-r from-orange-500 to-amber-400 text-white shadow-lg"
-                : "text-slate-600 hover:bg-slate-50"
-            }`}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition ${tab === "orders"
+              ? "bg-linear-to-r from-orange-500 to-amber-400 text-white shadow-lg"
+              : "text-slate-600 hover:bg-slate-50"
+              }`}
           >
             <Package size={18} />
             سفارش‌ها
             {orders.length > 0 && (
               <span
-                className={`rounded-full px-2 py-0.5 text-xs ${
-                  tab === "orders"
-                    ? "bg-white/25"
-                    : "bg-orange-100 text-orange-600"
-                }`}
+                className={`rounded-full px-2 py-0.5 text-xs ${tab === "orders"
+                  ? "bg-white/25"
+                  : "bg-orange-100 text-orange-600"
+                  }`}
               >
                 {orders.length.toLocaleString("fa-IR")}
               </span>

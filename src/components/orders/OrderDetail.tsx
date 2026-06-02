@@ -162,16 +162,7 @@ export default function OrderDetail({ orderId }: Props) {
                       : order.paymentMethod}
                   </span>
                 </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>وضعیت پرداخت</span>
-                  <span
-                    className={
-                      order.isPaid ? "text-emerald-600" : "text-amber-600"
-                    }
-                  >
-                    {order.isPaid ? "پرداخت شده" : "پرداخت نشده"}
-                  </span>
-                </div>
+                
                 <div className="h-px bg-slate-100" />
                 <div className="flex justify-between text-lg font-black">
                   <span>جمع کل</span>

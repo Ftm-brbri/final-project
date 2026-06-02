@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { fetchCart, getCartItemCount } from "@/src/lib/cart-api";
 import { CART_UPDATED_EVENT } from "@/src/lib/cart-events";
@@ -13,6 +13,7 @@ import { getStoredUserProfile } from "@/src/lib/user-api";
 import { setCartItemCount } from "@/src/store/cartSlice";
 import { useDispatch } from "react-redux";
 import type { RootState } from "@/src/store/store";
+import axios from "axios";
 
 const navItems = [
   {
@@ -38,6 +39,18 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
+
+  const [search, setSearch] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState<
+    { _id: string; name: string; price: number; images?: string[] }[]
+  >([]);
+
+  const searchBoxRef = useRef<HTMLDivElement | null>(null);
+  const searchAbortRef = useRef<AbortController | null>(null);
+
+  const trimmedSearch = useMemo(() => search.trim(), [search]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -88,6 +101,87 @@ export default function Header() {
     window.addEventListener(CART_UPDATED_EVENT, onCartUpdated);
     return () => window.removeEventListener(CART_UPDATED_EVENT, onCartUpdated);
   }, [dispatch]);
+
+  useEffect(() => {
+    function onDocMouseDown(e: MouseEvent) {
+      if (!searchBoxRef.current) return;
+      if (!searchBoxRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", onDocMouseDown);
+    return () => document.removeEventListener("mousedown", onDocMouseDown);
+  }, []);
+
+  useEffect(() => {
+    if (trimmedSearch.length < 1) {
+      setSearchLoading(false);
+      setSearchResults([]);
+      return;
+    }
+
+    const t = setTimeout(async () => {
+      try {
+        searchAbortRef.current?.abort();
+        const controller = new AbortController();
+        searchAbortRef.current = controller;
+
+        setSearchLoading(true);
+
+        const res = await axios.get(
+          `https://maktab-shop.runflare.run/api/products`,
+          {
+            params: {
+              search: trimmedSearch,
+              page: 1,
+              limit: 6,
+            },
+            signal: controller.signal,
+          },
+        );
+
+        const data =
+          res.data?.data?.products ||
+          res.data?.data?.items ||
+          res.data?.data ||
+          res.data ||
+          [];
+
+        setSearchResults(Array.isArray(data) ? data : []);
+        setSearchOpen(true);
+      } catch (err) {
+        const isAbort =
+          typeof err === "object" &&
+          err !== null &&
+          "name" in err &&
+          (err as { name?: string }).name === "CanceledError";
+        if (!isAbort) {
+          setSearchResults([]);
+        }
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 350);
+
+    return () => clearTimeout(t);
+  }, [trimmedSearch]);
+
+  const goToSearch = () => {
+    const q = trimmedSearch;
+    if (!q) return;
+
+    if (searchResults.length === 1) {
+      router.push(`/products/${searchResults[0]._id}`);
+      setSearchOpen(false);
+      return;
+    }
+
+    // Products page currently doesn't filter by search param,
+    // but we keep the query in the URL for future use.
+    router.push(`/products?search=${encodeURIComponent(q)}`);
+    setSearchOpen(false);
+  };
   //the handle for the category part
   const handleNavClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -165,25 +259,71 @@ export default function Header() {
         </div>
         {/* Center Search */}
         <div className="hidden w-full max-w-xl lg:block">
-          <div className="flex w-90 items-center overflow-hidden rounded-2xl border border-slate-600/50 bg-slate-800/70 shadow-inner shadow-black/20 backdrop-blur-xl transition focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-500/25">
-            <div className="px-4 text-orange-400/80">
-              <Search size={20} />
+          <div ref={searchBoxRef} className="relative">
+            <div className="flex w-90 items-center overflow-hidden rounded-2xl border border-slate-600/50 bg-slate-800/70 shadow-inner shadow-black/20 backdrop-blur-xl transition focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-500/25">
+              <div className="px-4 text-orange-400/80">
+                <Search size={20} />
+              </div>
+
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => {
+                  if (trimmedSearch) setSearchOpen(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") goToSearch();
+                  if (e.key === "Escape") setSearchOpen(false);
+                }}
+                type="text"
+                placeholder="جستجو در اسپرتکس..."
+                className="w-full bg-transparent px-2 py-4 text-sm text-slate-100 outline-none placeholder:text-slate-400"
+              />
+
+              <button
+                type="button"
+                onClick={goToSearch}
+                className="border-r border-slate-600/50 px-4 text-sm font-bold text-amber-100/90 transition hover:text-amber-100"
+              >
+                {searchLoading ? "..." : "جستجو"}
+              </button>
             </div>
 
-            <input
-              type="text"
-              placeholder="جستجو در اسپرتکس..."
-              className="w-full bg-transparent px-2 py-4 text-sm text-slate-100 outline-none placeholder:text-slate-400"
-            />
-
-            <div className="border-r border-slate-600/50 px-4">
-              <select className="bg-transparent text-sm text-amber-100/90 outline-none">
-                <option className="text-black">همه دسته‌بندی‌ها</option>
-                <option className="text-black">کفش ورزشی</option>
-                <option className="text-black">لباس ورزشی</option>
-                <option className="text-black">تجهیزات</option>
-              </select>
-            </div>
+            {searchOpen && trimmedSearch && (
+              <div className="absolute left-0 right-0 top-full mt-2 overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/95 shadow-2xl shadow-black/40 backdrop-blur-xl">
+                {searchLoading ? (
+                  <div className="px-4 py-4 text-sm text-slate-300">
+                    در حال جستجو...
+                  </div>
+                ) : searchResults.length === 0 ? (
+                  <div className="px-4 py-4 text-sm text-slate-300">
+                    موردی یافت نشد
+                  </div>
+                ) : (
+                  <ul className="divide-y divide-slate-800">
+                    {searchResults.slice(0, 6).map((p) => (
+                      <li key={p._id}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            router.push(`/products/${p._id}`);
+                            setSearchOpen(false);
+                          }}
+                          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-right text-sm text-slate-100 transition hover:bg-slate-800/60"
+                        >
+                          <span className="line-clamp-1 font-bold">
+                            {p.name}
+                          </span>
+                          <span className="shrink-0 text-xs text-amber-200/80">
+                            {Number(p.price || 0).toLocaleString("fa-IR")} تومان
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
           </div>
         </div>
         {/* Left */}

@@ -32,10 +32,7 @@ export default function PaymentSuccessPage() {
     finalizedRef.current = true;
 
     async function finalizePurchase() {
-      if (isCheckoutOrderFinalized()) {
-        setStatus("success");
-        return;
-      }
+      
 
       const payload = getCheckoutOrder();
 
@@ -47,6 +44,7 @@ export default function PaymentSuccessPage() {
 
       try {
         const res = await createOrder(payload);
+        console.log(res);
 
         if (!res?.success) {
           setStatus("error");
@@ -72,17 +70,17 @@ export default function PaymentSuccessPage() {
     finalizePurchase();
   }, [dispatch]);
 
-  useEffect(() => {
-    if (status !== "success") return;
+  // useEffect(() => {
+  //   if (status !== "success") return;
 
-    const redirectPath = orderId ? `/orders/${orderId}` : "/orders";
+  //   const redirectPath = orderId ? `/orders/${orderId}` : "/orders";
 
-    const timer = setTimeout(() => {
-      router.push(redirectPath);
-    }, 5000);
+  //   const timer = setTimeout(() => {
+  //     router.push(redirectPath);
+  //   }, 5000);
 
-    return () => clearTimeout(timer);
-  }, [status, orderId, router]);
+  //   return () => clearTimeout(timer);
+  // }, [status, orderId, router]);
 
   const redirectPath = orderId ? `/orders/${orderId}` : "/orders";
 

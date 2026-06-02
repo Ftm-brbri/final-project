@@ -97,7 +97,7 @@ export default function CheckoutPage() {
       saveCheckoutOrder({
         shippingAddress: {
           name: profile?.name ?? "کاربر",
-          phone: "+9949025858",
+          phone: profile?.phone ?? "",
           address: address, // استفاده از استیت آدرس
         },
         paymentMethod: selectedPayment,

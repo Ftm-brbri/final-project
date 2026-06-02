@@ -5,26 +5,37 @@ export type UserProfile = {
   _id: string;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   role: string;
   address?: string;
   createdAt?: string;
   updatedAt?: string;
 };
 
-type MeResponse = {
+type ProfileResponse = {
   success: boolean;
   data?: UserProfile;
 };
 
-export async function fetchUserProfile(): Promise<UserProfile | null> {
-  const { data } = await userAxios.get<MeResponse>("/auth/me");
+function persistUserProfile(profile: UserProfile) {
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem(USER_DATA_KEY, JSON.stringify(profile));
+  }
+}
+
+export async function fetchProfile(): Promise<UserProfile | null> {
+  const { data } = await userAxios.get<ProfileResponse>("/profile");
   if (!data?.success || !data.data) return null;
 
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.data));
-  }
+  persistUserProfile(data.data);
+  return data.data;
+}
 
+export async function fetchUserProfile(): Promise<UserProfile | null> {
+  const { data } = await userAxios.get<ProfileResponse>("/auth/me");
+  if (!data?.success || !data.data) return null;
+
+  persistUserProfile(data.data);
   return data.data;
 }
 
