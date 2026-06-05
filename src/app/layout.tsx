@@ -42,7 +42,7 @@ export default function RootLayout({
     <html dir="rtl" lang="fa">
       <body
         // استفاده از roboto.variable برای اعمال متغیر CSS
-        className={`bg-gray-50 text-gray-900 font-sans antialiased ${roboto.variable}`}
+        className={`min-h-full flex flex-col bg-gray-50 text-gray-900 font-sans antialiased ${roboto.variable}`}
       >
         <StoreProvider>
           {children}
