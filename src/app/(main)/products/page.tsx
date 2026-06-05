@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -21,7 +21,7 @@ type Product = {
 
 const ITEMS_PER_PAGE = 8;
 
-export default function ProductsPage() {
+function ProductsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -199,5 +199,19 @@ export default function ProductsPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center text-slate-500">
+          در حال بارگذاری محصولات...
+        </div>
+      }
+    >
+      <ProductsPageContent />
+    </Suspense>
   );
 }
