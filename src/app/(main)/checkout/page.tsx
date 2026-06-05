@@ -26,21 +26,14 @@ export default function CheckoutPage() {
   const [discountCode, setDiscountCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
   const [selectedPayment, setSelectedPayment] = useState("online");
-
-  // استیت جدید برای مدیریت آدرس
   const [address, setAddress] = useState("");
 
   useEffect(() => {
     const profile = getStoredUserProfile();
     if (profile?.address) {
-      // استفاده از setTimeout برای جلوگیری از خطای cascading renders
-     setTimeout(() => setAddress(profile.address || ""), 0);
-
+      //cascading renders prevent setTimeout
+      setTimeout(() => setAddress(profile.address || ""), 0);
     }
-
-    // بقیه کدهای loadCart...
-
-
     const loadCart = async () => {
       try {
         setCartLoading(true);
@@ -55,16 +48,12 @@ export default function CheckoutPage() {
 
     loadCart();
   }, []);
-
-  // TOTAL ITEMS PRICE
   const itemsPrice = useMemo(() => {
     return cart?.totalPrice ?? 0;
   }, [cart]);
 
-  // FINAL PRICE
   const finalPrice = Math.max(itemsPrice + SHIPPING_PRICE - discountAmount, 0);
 
-  // APPLY DISCOUNT
   const handleApplyDiscount = () => {
     if (!discountCode.trim()) {
       toast.error("لطفاً کد تخفیف را وارد کنید");
@@ -81,9 +70,9 @@ export default function CheckoutPage() {
     }
   };
 
-  // GO TO PAYMENT PAGE
+  //payment
   const handleContinuePayment = async () => {
-    // اعتبارسنجی آدرس قبل از پرداخت
+    // check add
     if (!address.trim()) {
       toast.error("لطفاً آدرس ارسال را وارد کنید");
       return;
@@ -98,7 +87,7 @@ export default function CheckoutPage() {
         shippingAddress: {
           name: profile?.name ?? "کاربر",
           phone: profile?.phone ?? "",
-          address: address, // استفاده از استیت آدرس
+          address: address,
         },
         paymentMethod: selectedPayment,
       });
@@ -132,9 +121,9 @@ export default function CheckoutPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-12">
-          {/* RIGHT SIDE */}
+          {/*right*/}
           <div className="space-y-6 lg:col-span-8">
-            {/* PAYMENT METHOD */}
+            {/*pay*/}
             <div className="rounded-3xl bg-white p-6 shadow-sm">
               <div className="mb-6 flex items-center gap-2">
                 <CreditCard className="text-orange-500" />
@@ -195,7 +184,7 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* DISCOUNT */}
+            {/*dis*/}
             <div className="rounded-3xl bg-white p-6 shadow-sm">
               <div className="mb-6 flex items-center gap-2">
                 <TicketPercent className="text-orange-500" />
@@ -212,38 +201,36 @@ export default function CheckoutPage() {
 
                 <button
                   onClick={handleApplyDiscount}
-                  className="h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-400 px-8 font-bold text-white transition hover:opacity-90"
+                  className="h-14 rounded-2xl bg-linear-to-br from-orange-500 to-amber-400 px-8 font-bold text-white transition hover:opacity-90"
                 >
                   ثبت کد
                 </button>
               </div>
             </div>
 
-            {/* SHIPPING INFO */}
+            {/*ship*/}
             <div className="rounded-3xl bg-white p-6 shadow-sm">
               <div className="mb-6 flex items-center gap-2">
                 <Truck className="text-orange-500" />
                 <h2 className="text-lg font-black text-slate-800">
-                  اطلاعات ارسال
+                  اطلاعات ارسال (درصورت تمایل دریافت در محل دیگر){" "}
                 </h2>
               </div>
-
-              {/* تغییر به یک Textarea قابل ویرایش */}
               <textarea
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="آدرسی ثبت نشده است"
-                className="w-full min-h-[100px] resize-none rounded-2xl border border-slate-200 bg-slate-50 p-5 leading-8 text-slate-700 outline-none transition focus:border-orange-500"
+                className="w-full min-h-25 resize-none rounded-2xl border border-slate-200 bg-slate-50 p-5 leading-8 text-slate-700 outline-none transition focus:border-orange-500"
               />
             </div>
           </div>
 
-          {/* LEFT SIDE */}
+          {/*left*/}
           <div className="lg:col-span-4">
             <div className="sticky top-24 rounded-3xl bg-white p-6 shadow-sm">
               <h2 className="text-xl font-black text-slate-900">خلاصه سفارش</h2>
 
-              {/* PRODUCTS */}
+              {/*product*/}
               <div className="mt-6 space-y-4">
                 {cartLoading ? (
                   <div className="py-6 text-center">
@@ -289,7 +276,7 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {/* PRICE DETAILS */}
+              {/*price*/}
               <div className="mt-8 space-y-5 border-t border-dashed border-slate-200 pt-6">
                 <div className="flex items-center justify-between text-sm text-slate-600">
                   <span>مجموع کالاها</span>
@@ -316,7 +303,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* FINAL PRICE */}
+              {/*final*/}
               <div className="mt-8 rounded-2xl bg-slate-50 p-5">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-600">
@@ -328,11 +315,11 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* SUBMIT BUTTON */}
+              {/*submit*/}
               <button
                 onClick={handleContinuePayment}
                 disabled={loading || !cart?.items?.length}
-                className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-400 text-lg font-black text-white transition hover:opacity-90 disabled:opacity-70"
+                className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-br from-orange-500 to-amber-400 text-lg font-black text-white transition hover:opacity-90 disabled:opacity-70"
               >
                 {loading ? (
                   "در حال انتقال..."
@@ -344,7 +331,6 @@ export default function CheckoutPage() {
                 )}
               </button>
 
-              {/* SECURITY */}
               <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-500">
                 <ShieldCheck size={14} />
                 پرداخت شما کاملاً امن و رمزنگاری شده است

@@ -79,7 +79,6 @@ export default function Cart() {
     syncCartCount(data);
   };
 
-
   const handleUpdateQuantity = async (
     item: CartLineItem,
     type: "increase" | "decrease",
@@ -262,8 +261,9 @@ export default function Cart() {
                       </div>
 
                       <div className="flex justify-between">
-                        <div className="flex items-center border rounded-xl">
+                        <div className="flex items-center rounded-xl gap-3">
                           <button
+                            className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-r from-orange-500 to-amber-400 text-white shadow-sm transition hover:bg-orange-100"
                             onClick={() =>
                               handleUpdateQuantity(item, "decrease")
                             }
@@ -275,6 +275,7 @@ export default function Cart() {
                           <span>{item.quantity}</span>
 
                           <button
+                            className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-r from-orange-500 to-amber-400 text-white transition disabled:cursor-not-allowed disabled:opacity-40"
                             onClick={() =>
                               handleUpdateQuantity(item, "increase")
                             }
@@ -286,7 +287,7 @@ export default function Cart() {
                           </button>
                         </div>
 
-                        <div className="font-black text-orange-500">
+                        <div className="font-black text-xl text-orange-500">
                           {(item.price * item.quantity).toLocaleString("fa-IR")}
                         </div>
                       </div>

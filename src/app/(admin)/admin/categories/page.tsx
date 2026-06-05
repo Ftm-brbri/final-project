@@ -9,7 +9,7 @@ const ADMIN_CATEGORIES = [
     id: 1,
     title: "ست‌های ورزشی",
     slug: "set",
-    image: "/image/367-4.jpg",
+    image: "/image/357-7.jpg",
     count: 12,
   },
   {
@@ -30,14 +30,14 @@ const ADMIN_CATEGORIES = [
     id: 4,
     title: "لباس ورزشی زنانه",
     slug: "women",
-    image: "/image/367-5.jpg",
+    image: "/image/367-4-2.jpg",
     count: 24,
   },
   {
     id: 5,
     title: "لباس ورزشی مردانه",
     slug: "men",
-    image: "/image/3d85c22e6bb7fefcd9f5063f9ed65b5a03194878_1767522242.webp",
+    image: "/image/367-4.jpg",
     count: 18,
   },
   {
@@ -51,7 +51,7 @@ const ADMIN_CATEGORIES = [
     id: 7,
     title: "استوک",
     slug: "stoke",
-    image: "/image/pro_60929_558.webp",
+    image: "/image/pro_60929_558-2-2.jpg",
     count: 3,
   },
 ];
